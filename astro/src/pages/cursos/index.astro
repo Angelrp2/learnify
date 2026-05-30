@@ -57,14 +57,25 @@ const description = 'Explora nuestro catálogo completo de cursos de programaci�
 
         <div class="main-content">
           <div class="search-bar">
-            <input 
-              type="text" 
-              id="searchInput" 
-              placeholder="Buscar cursos..." 
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Buscar cursos..."
             />
           </div>
 
-          <div id="loadingMessage" class="loading">
+          <div class="sort-bar">
+            <label for="sortSelect">Ordenar por:</label>
+            <select id="sortSelect">
+              <option value="default">Relevancia</option>
+              <option value="title-asc">Título A → Z</option>
+              <option value="title-desc">Título Z → A</option>
+              <option value="difficulty-asc">Dificultad (menor → mayor)</option>
+              <option value="difficulty-desc">Dificultad (mayor → menor)</option>
+            </select>
+          </div>
+
+          <div id="loadingMessage" class="loading" style="display: none;">
             Cargando cursos...
           </div>
 
@@ -148,6 +159,24 @@ const description = 'Explora nuestro catálogo completo de cursos de programaci�
     border-radius: 0.25rem;
     background-color: var(--bg-primary);
     color: var(--text-primary);
+  }
+
+  .sort-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+
+  .sort-bar select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    cursor: pointer;
   }
 
   .search-bar {
@@ -248,29 +277,50 @@ const description = 'Explora nuestro catálogo completo de cursos de programaci�
   const pageSize = 6;
 
   const searchInput = document.getElementById('searchInput');
+  const sortSelect = document.getElementById('sortSelect');
   const difficultyCheckboxes = document.querySelectorAll('input[name="difficulty"]');
   const categoryFilter = document.getElementById('categoryFilter');
+  const loadingMessage = document.getElementById('loadingMessage');
   const coursesContainer = document.getElementById('coursesContainer');
   const paginationContainer = document.getElementById('paginationContainer');
   const noResults = document.getElementById('noResults');
 
+  const difficultyOrder = { beginner: 1, intermediate: 2, advanced: 3 };
+
+  function applySort(results) {
+    const order = sortSelect.value;
+    const sorted = [...results];
+    if (order === 'title-asc') {
+      sorted.sort((a, b) => a.attributes.title.localeCompare(b.attributes.title));
+    } else if (order === 'title-desc') {
+      sorted.sort((a, b) => b.attributes.title.localeCompare(a.attributes.title));
+    } else if (order === 'difficulty-asc') {
+      sorted.sort((a, b) =>
+        (difficultyOrder[a.attributes.difficulty] || 0) - (difficultyOrder[b.attributes.difficulty] || 0)
+      );
+    } else if (order === 'difficulty-desc') {
+      sorted.sort((a, b) =>
+        (difficultyOrder[b.attributes.difficulty] || 0) - (difficultyOrder[a.attributes.difficulty] || 0)
+      );
+    }
+    return sorted;
+  }
+
   function applyFilters() {
+    loadingMessage.style.display = 'block';
+    coursesContainer.style.display = 'none';
+
     let results = allCourses;
 
-    // Búsqueda
     const searchQuery = searchInput.value;
     if (searchQuery) {
       const regex = new RegExp(searchQuery, 'i');
       results = results.filter(course => {
         const { attributes } = course;
-        return (
-          regex.test(attributes.title) ||
-          regex.test(attributes.description)
-        );
+        return regex.test(attributes.title) || regex.test(attributes.description);
       });
     }
 
-    // Dificultad
     const selectedDifficulties = Array.from(difficultyCheckboxes)
       .filter(cb => cb.checked)
       .map(cb => cb.value);
@@ -281,20 +331,22 @@ const description = 'Explora nuestro catálogo completo de cursos de programaci�
       );
     }
 
-    // Categoría
-    const selectedCategory = categoryFilter.value;
+    const selectedCategory = categoryFilter?.value;
     if (selectedCategory) {
       results = results.filter(course =>
         course.attributes.category?.data?.id === parseInt(selectedCategory)
       );
     }
 
-    filteredCourses = results;
+    filteredCourses = applySort(results);
     currentPage = 1;
     renderCourses();
   }
 
   function renderCourses() {
+    loadingMessage.style.display = 'none';
+    coursesContainer.style.display = '';
+
     if (filteredCourses.length === 0) {
       coursesContainer.innerHTML = '';
       noResults.style.display = 'block';
@@ -304,41 +356,33 @@ const description = 'Explora nuestro catálogo completo de cursos de programaci�
 
     noResults.style.display = 'none';
 
-    const { courses: paginatedCourses, totalPages } = paginateCourses(
-      filteredCourses,
-      currentPage,
-      pageSize
-    );
+    const start = (currentPage - 1) * pageSize;
+    const paginatedCourses = filteredCourses.slice(start, start + pageSize);
+    const totalPages = Math.ceil(filteredCourses.length / pageSize);
 
-    // Renderizar cursos
     coursesContainer.innerHTML = paginatedCourses
       .map(course => `
         <div class="card">
           ${course.attributes.image ? `<img src="${course.attributes.image}" alt="${course.attributes.title}" class="card-image" />` : ''}
           <div class="card-content">
             <h3>${course.attributes.title}</h3>
-            <p>${course.attributes.description}</p>
+            <p>${course.attributes.description || ''}</p>
             <a href="/cursos/${course.attributes.slug}" class="card-link">Ver más →</a>
           </div>
         </div>
       `)
       .join('');
 
-    // Renderizar paginación
     let paginationHTML = '';
     if (currentPage > 1) {
       paginationHTML += `<button onclick="goToPage(${currentPage - 1})">← Anterior</button>`;
     }
-
     for (let i = 1; i <= totalPages; i++) {
-      const activeClass = i === currentPage ? 'active' : '';
-      paginationHTML += `<button onclick="goToPage(${i})" class="${activeClass}">${i}</button>`;
+      paginationHTML += `<button onclick="goToPage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`;
     }
-
     if (currentPage < totalPages) {
       paginationHTML += `<button onclick="goToPage(${currentPage + 1})">Siguiente →</button>`;
     }
-
     paginationContainer.innerHTML = paginationHTML;
   }
 
@@ -348,23 +392,10 @@ const description = 'Explora nuestro catálogo completo de cursos de programaci�
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  function paginateCourses(courses, page = 1, pageSize = 6) {
-    const start = (page - 1) * pageSize;
-    const end = start + pageSize;
-    const paginatedCourses = courses.slice(start, end);
-    const totalPages = Math.ceil(courses.length / pageSize);
-
-    return {
-      courses: paginatedCourses,
-      currentPage: page,
-      totalPages,
-    };
-  }
-
   searchInput.addEventListener('input', applyFilters);
+  sortSelect.addEventListener('change', applyFilters);
   difficultyCheckboxes.forEach(cb => cb.addEventListener('change', applyFilters));
-  categoryFilter.addEventListener('change', applyFilters);
+  categoryFilter?.addEventListener('change', applyFilters);
 
-  // Renderizar inicial
   renderCourses();
 </script>
