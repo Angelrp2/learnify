@@ -17,80 +17,32 @@ const {
   class: className = '',
 } = Astro.props;
 
-const baseClass = 'btn btn-' + variant + ' btn-' + size;
-const finalClass = `${baseClass} ${className}`;
+const variantClasses: Record<string, string> = {
+  primary: 'bg-primary text-white hover:bg-blue-700 hover:shadow-lg',
+  secondary: 'bg-secondary text-white hover:bg-slate-500',
+  outline: 'bg-transparent text-primary border-2 border-primary hover:bg-primary hover:text-white',
+};
+
+const sizeClasses: Record<string, string> = {
+  sm: 'px-4 py-2 text-sm',
+  md: 'px-6 py-3 text-base',
+  lg: 'px-8 py-4 text-lg',
+};
+
+const base =
+  'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 no-underline text-center hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none';
+
+const classes = [base, variantClasses[variant], sizeClasses[size], className].join(' ');
 ---
 
 {
   href ? (
-    <a href={href} class={finalClass}>
+    <a href={href} class={classes}>
       <slot />
     </a>
   ) : (
-    <button type={type} disabled={disabled} class={finalClass}>
+    <button type={type} disabled={disabled} class={classes}>
       <slot />
     </button>
   )
 }
-
-<style>
-  .btn {
-    display: inline-block;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 0.5rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    text-align: center;
-    font-size: 1rem;
-  }
-
-  .btn-primary {
-    background-color: var(--color-primary);
-    color: white;
-  }
-
-  .btn-primary:hover:not(:disabled) {
-    background-color: #1e40af;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-  }
-
-  .btn-secondary {
-    background-color: var(--color-secondary);
-    color: white;
-  }
-
-  .btn-secondary:hover:not(:disabled) {
-    background-color: #475569;
-    transform: translateY(-2px);
-  }
-
-  .btn-outline {
-    background-color: transparent;
-    color: var(--color-primary);
-    border: 2px solid var(--color-primary);
-  }
-
-  .btn-outline:hover:not(:disabled) {
-    background-color: var(--color-primary);
-    color: white;
-  }
-
-  .btn-sm {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-  }
-
-  .btn-lg {
-    padding: 1rem 2rem;
-    font-size: 1.125rem;
-  }
-
-  .btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-</style>
