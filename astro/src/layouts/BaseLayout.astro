@@ -1,152 +1,98 @@
 ---
+import '../styles/global.css';
+
 interface Props {
   title: string;
   description?: string;
 }
 
 const { title, description = 'Learnify - Plataforma de Cursos' } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <title>{title}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:site_name" content="Learnify" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    <!-- Prevent FOUC on dark mode -->
+    <script is:inline>
+      (function () {
+        const theme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (theme === 'dark' || (!theme && prefersDark)) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
   </head>
-  <body>
-    <header>
-      <nav class="navbar">
-        <div class="container">
-          <div class="navbar-brand">
-            <a href="/">Learnify</a>
-          </div>
-          <ul class="navbar-menu">
-            <li><a href="/cursos">Cursos</a></li>
-            <li><a href="/blog">Blog</a></li>
-            <li><a href="/contacto">Contacto</a></li>
-          </ul>
-        </div>
+  <body class="bg-bg-base text-text-base flex flex-col min-h-screen">
+    <header class="bg-bg-muted border-b border-border sticky top-0 z-50">
+      <nav class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+        <a href="/" class="text-2xl font-bold text-primary no-underline">Learnify</a>
+        <ul class="flex items-center gap-6 list-none m-0 p-0">
+          <li><a href="/cursos" class="text-text-base no-underline hover:text-primary transition-colors">Cursos</a></li>
+          <li><a href="/categorias" class="text-text-base no-underline hover:text-primary transition-colors">Categorías</a></li>
+          <li><a href="/blog" class="text-text-base no-underline hover:text-primary transition-colors">Blog</a></li>
+          <li><a href="/contacto" class="text-text-base no-underline hover:text-primary transition-colors">Contacto</a></li>
+          <li>
+            <button
+              id="theme-toggle"
+              class="p-2 rounded-lg text-text-muted hover:text-text-base hover:bg-bg-base transition-colors cursor-pointer border-0 bg-transparent"
+              aria-label="Toggle dark mode"
+            >
+              <svg id="icon-moon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+              </svg>
+              <svg id="icon-sun" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            </button>
+          </li>
+        </ul>
       </nav>
     </header>
 
     <slot />
 
-    <footer>
-      <div class="container">
+    <footer class="bg-bg-muted border-t border-border py-8 text-center text-text-muted mt-auto">
+      <div class="max-w-7xl mx-auto px-4">
         <p>Copyright 2024 Learnify. Todos los derechos reservados.</p>
       </div>
     </footer>
+
+    <script>
+      const toggle = document.getElementById('theme-toggle');
+      const iconMoon = document.getElementById('icon-moon');
+      const iconSun = document.getElementById('icon-sun');
+
+      function updateIcons() {
+        const isDark = document.documentElement.classList.contains('dark');
+        iconMoon?.classList.toggle('hidden', isDark);
+        iconSun?.classList.toggle('hidden', !isDark);
+      }
+
+      updateIcons();
+
+      toggle?.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        updateIcons();
+      });
+    </script>
   </body>
 </html>
-
-<style is:global>
-  :root {
-    --color-primary: #2563eb;
-    --color-secondary: #64748b;
-    --bg-primary: #ffffff;
-    --bg-secondary: #f8fafc;
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --border: #e2e8f0;
-  }
-
-  html.dark {
-    --bg-primary: #0f172a;
-    --bg-secondary: #1e293b;
-    --text-primary: #f1f5f9;
-    --text-secondary: #cbd5e1;
-    --border: #334155;
-  }
-
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  html {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    font-size: 16px;
-    line-height: 1.6;
-    color: var(--text-primary);
-    background-color: var(--bg-primary);
-  }
-
-  body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-
-  main {
-    flex: 1;
-  }
-
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-  }
-
-  header {
-    background-color: var(--bg-secondary);
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-
-  .navbar {
-    display: flex;
-    align-items: center;
-    height: 60px;
-  }
-
-  .navbar .container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-  }
-
-  .navbar-brand a {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--color-primary);
-    text-decoration: none;
-  }
-
-  .navbar-menu {
-    display: flex;
-    list-style: none;
-    gap: 2rem;
-  }
-
-  .navbar-menu a {
-    color: var(--text-primary);
-    text-decoration: none;
-    transition: color 0.3s ease;
-  }
-
-  .navbar-menu a:hover {
-    color: var(--color-primary);
-  }
-
-  footer {
-    background-color: var(--bg-secondary);
-    border-top: 1px solid var(--border);
-    padding: 2rem 0;
-    text-align: center;
-    color: var(--text-secondary);
-  }
-
-  @media (max-width: 768px) {
-    .navbar-menu {
-      gap: 1rem;
-      font-size: 0.9rem;
-    }
-  }
-</style>
