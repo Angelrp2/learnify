@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Section from '../../components/Section.astro';
+import Container from '../../components/Container.astro';
+import { fetchCategories, fetchCourses } from '../../lib/api.js';
+import { slugify } from '../../lib/utils.js';
+
+const [categories, allCourses] = await Promise.all([fetchCategories(), fetchCourses()]);
+
+function courseCount(categoryId: number): number {
+  return allCourses.filter(
+    (c: any) => (c.attributes?.category?.data?.id ?? c.category?.id) === categoryId
+  ).length;
+}
+---
+
+<BaseLayout title="Categorías | Learnify" description="Explora los cursos de programación por categoría">
+  <main class="flex-1">
+    <Section class="py-16">
+      <Container>
+        <h1 class="text-3xl font-bold mb-2 text-text-base">Categorías</h1>
+        <p class="text-text-muted mb-10">Encuentra los cursos que más te interesan por área temática.</p>
+
+        {
+          categories.length === 0 ? (
+            <p class="text-text-muted">No hay categorías disponibles.</p>
+          ) : (
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {categories.map((cat: any) => {
+                const name = cat.attributes?.name ?? cat.name ?? 'Sin nombre';
+                const slug = cat.attributes?.slug ?? slugify(name);
+                const count = courseCount(cat.id);
+                return (
+                  <a
+                    href={`/categorias/${slug}`}
+                    class="block bg-bg-muted border border-border rounded-xl p-6 no-underline group hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+                  >
+                    <h2 class="text-xl font-semibold text-text-base group-hover:text-primary transition-colors mb-2">
+                      {name}
+                    </h2>
+                    <p class="text-text-muted text-sm">
+                      {count} {count === 1 ? 'curso' : 'cursos'}
+                    </p>
+                  </a>
+                );
+              })}
+            </div>
+          )
+        }
+      </Container>
+    </Section>
+  </main>
+</BaseLayout>
