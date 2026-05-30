@@ -1,0 +1,188 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Card from '../../components/Card.astro';
+import { fetchBlogPosts } from '../../lib/api';
+import { calculateReadingTime } from '../../lib/utils';
+
+const posts = await fetchBlogPosts();
+
+const title = 'Blog | Learnify';
+const description = 'Artículos educativos sobre programación y desarrollo web';
+---
+
+<BaseLayout title={title} description={description}>
+  <main>
+    <div class="container">
+      <h1>Blog</h1>
+      <p class="subtitle">Artículos educativos sobre programación y desarrollo web</p>
+
+      {posts.length === 0 ? (
+        <div class="no-posts">
+          <p>No hay artículos disponibles</p>
+        </div>
+      ) : (
+        <div class="blog-grid">
+          {posts.map(post => {
+            const { attributes } = post;
+            const readingTime = calculateReadingTime(attributes.content);
+            return (
+              <article class="blog-card">
+                {attributes.image && (
+                  <img src={attributes.image} alt={attributes.title} class="blog-image" />
+                )}
+                <div class="blog-content">
+                  <div class="blog-meta">
+                    {attributes.category?.data && (
+                      <span class="category">{attributes.category.data.attributes.name}</span>
+                    )}
+                    <span class="reading-time">{readingTime} min de lectura</span>
+                  </div>
+                  <h2>
+                    <a href={`/blog/${attributes.slug}`}>{attributes.title}</a>
+                  </h2>
+                  <p>{attributes.excerpt}</p>
+                  <div class="blog-footer">
+                    {attributes.author?.data && (
+                      <span class="author">Por {attributes.author.data.attributes.name}</span>
+                    )}
+                    {attributes.publishedAt && (
+                      <span class="date">
+                        {new Date(attributes.publishedAt).toLocaleDateString('es-ES')}
+                      </span>
+                    )}
+                  </div>
+                  <a href={`/blog/${attributes.slug}`} class="read-more">Leer más →</a>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  h1 {
+    margin: 2rem 0 0.5rem;
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+  }
+
+  .no-posts {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-secondary);
+  }
+
+  .blog-grid {
+    display: grid;
+    gap: 2rem;
+    margin: 2rem 0;
+  }
+
+  .blog-card {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    display: grid;
+    grid-template-columns: 250px 1fr;
+  }
+
+  .blog-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .blog-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+
+  .blog-content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .blog-meta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .category {
+    background-color: var(--color-primary);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.25rem;
+  }
+
+  .reading-time {
+    color: var(--text-secondary);
+  }
+
+  .blog-card h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.5rem;
+  }
+
+  .blog-card h2 a {
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .blog-card h2 a:hover {
+    color: var(--color-primary);
+  }
+
+  .blog-card p {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    flex: 1;
+    line-height: 1.6;
+  }
+
+  .blog-footer {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+  }
+
+  .read-more {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+
+  .read-more:hover {
+    color: #1e40af;
+  }
+
+  @media (max-width: 768px) {
+    .blog-card {
+      grid-template-columns: 1fr;
+    }
+
+    .blog-image {
+      height: 250px;
+    }
+
+    .blog-meta {
+      flex-wrap: wrap;
+    }
+  }
+</style>

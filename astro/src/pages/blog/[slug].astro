@@ -1,0 +1,236 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Button from '../../components/Button.astro';
+import { fetchBlogPosts } from '../../lib/api';
+import { calculateReadingTime } from '../../lib/utils';
+
+const { slug } = Astro.params;
+const posts = await fetchBlogPosts();
+const post = posts.find(p => p.attributes.slug === slug);
+
+if (!post) {
+  return Astro.redirect('/404');
+}
+
+const { attributes } = post;
+const title = attributes.seo?.metaTitle || `${attributes.title} | Learnify`;
+const description = attributes.seo?.metaDescription || attributes.excerpt;
+const readingTime = calculateReadingTime(attributes.content);
+---
+
+<BaseLayout title={title} description={description}>
+  <main>
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="/blog">Blog</a>
+        <span>/</span>
+        <span>{attributes.title}</span>
+      </div>
+
+      <article class="blog-post">
+        <header class="post-header">
+          {attributes.image && (
+            <img src={attributes.image} alt={attributes.title} class="post-image" />
+          )}
+          <div class="post-meta">
+            <h1>{attributes.title}</h1>
+            <div class="post-info">
+              {attributes.category?.data && (
+                <span class="category">{attributes.category.data.attributes.name}</span>
+              )}
+              <span class="reading-time">{readingTime} minutos de lectura</span>
+              {attributes.publishedAt && (
+                <span class="date">
+                  {new Date(attributes.publishedAt).toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </span>
+              )}
+            </div>
+            {attributes.author?.data && (
+              <div class="author">
+                <p>Por: <strong>{attributes.author.data.attributes.name}</strong></p>
+              </div>
+            )}
+          </div>
+        </header>
+
+        <div class="post-content">
+          <div set:html={attributes.content}></div>
+        </div>
+
+        <footer class="post-footer">
+          <Button href="/blog">Volver al Blog</Button>
+        </footer>
+      </article>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .breadcrumb {
+    margin: 1rem 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+
+  .breadcrumb a {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+
+  .breadcrumb a:hover {
+    text-decoration: underline;
+  }
+
+  .breadcrumb span {
+    margin: 0 0.5rem;
+  }
+
+  .blog-post {
+    margin: 2rem 0;
+    max-width: 800px;
+  }
+
+  .post-header {
+    background-color: var(--bg-secondary);
+    padding: 2rem;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border);
+  }
+
+  .post-image {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .post-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .post-info {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .category {
+    display: inline-block;
+    background-color: var(--color-primary);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+  }
+
+  .reading-time,
+  .date {
+    display: inline-block;
+    color: var(--text-secondary);
+  }
+
+  .author {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .author p {
+    margin: 0;
+    color: var(--text-secondary);
+  }
+
+  .post-content {
+    background-color: var(--bg-primary);
+    padding: 2rem 0;
+    line-height: 1.8;
+  }
+
+  .post-content :global(h2) {
+    font-size: 1.75rem;
+    margin: 2rem 0 1rem;
+  }
+
+  .post-content :global(h3) {
+    font-size: 1.25rem;
+    margin: 1.5rem 0 0.75rem;
+  }
+
+  .post-content :global(p) {
+    margin-bottom: 1rem;
+  }
+
+  .post-content :global(ul),
+  .post-content :global(ol) {
+    margin: 1rem 0;
+    padding-left: 2rem;
+  }
+
+  .post-content :global(li) {
+    margin-bottom: 0.5rem;
+  }
+
+  .post-content :global(blockquote) {
+    border-left: 4px solid var(--color-primary);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+
+  .post-content :global(code) {
+    background-color: var(--bg-secondary);
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+  }
+
+  .post-content :global(pre) {
+    background-color: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+
+  .post-content :global(a) {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+
+  .post-content :global(a:hover) {
+    text-decoration: underline;
+  }
+
+  .post-footer {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 768px) {
+    .post-header h1 {
+      font-size: 1.75rem;
+    }
+
+    .post-info {
+      flex-direction: column;
+    }
+
+    .category,
+    .reading-time,
+    .date {
+      display: block;
+      width: 100%;
+    }
+  }
+</style>

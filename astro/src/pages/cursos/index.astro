@@ -1,5 +1,12 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Card from '../../components/Card.astro';
+import Button from '../../components/Button.astro';
+import { fetchCourses, fetchCategories } from '../../lib/api';
+import { searchCourses, filterCourses, paginateCourses } from '../../lib/utils';
+
+const courses = await fetchCourses();
+const categories = await fetchCategories();
 
 const title = 'Cursos | Learnify';
 const description = 'Explora nuestro catálogo completo de cursos de programación';
@@ -14,34 +21,71 @@ const description = 'Explora nuestro catálogo completo de cursos de programaci�
         <aside class="sidebar">
           <div class="filter-group">
             <h3>Filtros</h3>
+            
             <div class="filter-item">
+              <h4>Dificultad</h4>
               <label>
                 <input type="checkbox" name="difficulty" value="beginner" />
                 Principiante
               </label>
-            </div>
-            <div class="filter-item">
               <label>
                 <input type="checkbox" name="difficulty" value="intermediate" />
                 Intermedio
               </label>
-            </div>
-            <div class="filter-item">
               <label>
                 <input type="checkbox" name="difficulty" value="advanced" />
                 Avanzado
               </label>
             </div>
+
+            {categories.length > 0 && (
+              <div class="filter-item">
+                <h4>Categoría</h4>
+                <select name="category" id="categoryFilter">
+                  <option value="">Todas las categorías</option>
+                  {categories.map(cat => (
+                    <option value={cat.id}>{cat.attributes.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
         </aside>
 
         <div class="main-content">
           <div class="search-bar">
-            <input type="text" placeholder="Buscar cursos..." />
+            <input 
+              type="text" 
+              id="searchInput" 
+              placeholder="Buscar cursos..." 
+            />
           </div>
 
-          <div class="courses-grid">
-            <p>Cargando cursos...</p>
+          <div id="loadingMessage" class="loading">
+            Cargando cursos...
+          </div>
+
+          <div id="coursesContainer" class="courses-grid">
+            {courses.length === 0 ? (
+              <p>No hay cursos disponibles</p>
+            ) : (
+              courses.slice(0, 6).map(course => (
+                <Card
+                  title={course.attributes.title}
+                  description={course.attributes.description}
+                  image={course.attributes.image}
+                  href={`/cursos/${course.attributes.slug}`}
+                />
+              ))
+            )}
+          </div>
+
+          <div id="paginationContainer" class="pagination">
+            {/* Se llena con JavaScript */}
+          </div>
+
+          <div id="noResults" class="no-results" style="display: none;">
+            No se encontraron cursos que coincidan con tu búsqueda.
           </div>
         </div>
       </div>
@@ -66,6 +110,7 @@ const description = 'Explora nuestro catálogo completo de cursos de programaci�
     background-color: var(--bg-secondary);
     padding: 1.5rem;
     border-radius: 0.5rem;
+    border: 1px solid var(--border);
     height: fit-content;
   }
 
@@ -75,7 +120,13 @@ const description = 'Explora nuestro catálogo completo de cursos de programaci�
   }
 
   .filter-item {
+    margin-bottom: 1.5rem;
+  }
+
+  .filter-item h4 {
+    font-size: 0.95rem;
     margin-bottom: 0.75rem;
+    color: var(--text-secondary);
   }
 
   .filter-item label {
@@ -83,6 +134,16 @@ const description = 'Explora nuestro catálogo completo de cursos de programaci�
     align-items: center;
     cursor: pointer;
     gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .filter-item select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 0.25rem;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
   }
 
   .search-bar {
@@ -95,12 +156,66 @@ const description = 'Explora nuestro catálogo completo de cursos de programaci�
     border: 1px solid var(--border);
     border-radius: 0.5rem;
     font-size: 1rem;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+  }
+
+  .search-bar input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
   }
 
   .courses-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+  }
+
+  .no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+  }
+
+  .pagination button {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .pagination button:hover:not(:disabled) {
+    background-color: var(--color-primary);
+    color: white;
+  }
+
+  .pagination button.active {
+    background-color: var(--color-primary);
+    color: white;
+  }
+
+  .pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   @media (max-width: 768px) {
@@ -115,5 +230,137 @@ const description = 'Explora nuestro catálogo completo de cursos de programaci�
     .main-content {
       order: 1;
     }
+
+    .courses-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
+
+<script define:vars={{ courses: JSON.stringify(courses) }}>
+  const allCourses = JSON.parse(courses);
+  let filteredCourses = allCourses;
+  let currentPage = 1;
+  const pageSize = 6;
+
+  const searchInput = document.getElementById('searchInput');
+  const difficultyCheckboxes = document.querySelectorAll('input[name="difficulty"]');
+  const categoryFilter = document.getElementById('categoryFilter');
+  const coursesContainer = document.getElementById('coursesContainer');
+  const paginationContainer = document.getElementById('paginationContainer');
+  const noResults = document.getElementById('noResults');
+
+  function applyFilters() {
+    let results = allCourses;
+
+    // Búsqueda
+    const searchQuery = searchInput.value;
+    if (searchQuery) {
+      const regex = new RegExp(searchQuery, 'i');
+      results = results.filter(course => {
+        const { attributes } = course;
+        return (
+          regex.test(attributes.title) ||
+          regex.test(attributes.description)
+        );
+      });
+    }
+
+    // Dificultad
+    const selectedDifficulties = Array.from(difficultyCheckboxes)
+      .filter(cb => cb.checked)
+      .map(cb => cb.value);
+
+    if (selectedDifficulties.length > 0) {
+      results = results.filter(course =>
+        selectedDifficulties.includes(course.attributes.difficulty)
+      );
+    }
+
+    // Categoría
+    const selectedCategory = categoryFilter.value;
+    if (selectedCategory) {
+      results = results.filter(course =>
+        course.attributes.category?.data?.id === parseInt(selectedCategory)
+      );
+    }
+
+    filteredCourses = results;
+    currentPage = 1;
+    renderCourses();
+  }
+
+  function renderCourses() {
+    if (filteredCourses.length === 0) {
+      coursesContainer.innerHTML = '';
+      noResults.style.display = 'block';
+      paginationContainer.innerHTML = '';
+      return;
+    }
+
+    noResults.style.display = 'none';
+
+    const { courses: paginatedCourses, totalPages } = paginateCourses(
+      filteredCourses,
+      currentPage,
+      pageSize
+    );
+
+    // Renderizar cursos
+    coursesContainer.innerHTML = paginatedCourses
+      .map(course => `
+        <div class="card">
+          ${course.attributes.image ? `<img src="${course.attributes.image}" alt="${course.attributes.title}" class="card-image" />` : ''}
+          <div class="card-content">
+            <h3>${course.attributes.title}</h3>
+            <p>${course.attributes.description}</p>
+            <a href="/cursos/${course.attributes.slug}" class="card-link">Ver más →</a>
+          </div>
+        </div>
+      `)
+      .join('');
+
+    // Renderizar paginación
+    let paginationHTML = '';
+    if (currentPage > 1) {
+      paginationHTML += `<button onclick="goToPage(${currentPage - 1})">← Anterior</button>`;
+    }
+
+    for (let i = 1; i <= totalPages; i++) {
+      const activeClass = i === currentPage ? 'active' : '';
+      paginationHTML += `<button onclick="goToPage(${i})" class="${activeClass}">${i}</button>`;
+    }
+
+    if (currentPage < totalPages) {
+      paginationHTML += `<button onclick="goToPage(${currentPage + 1})">Siguiente →</button>`;
+    }
+
+    paginationContainer.innerHTML = paginationHTML;
+  }
+
+  window.goToPage = function(page) {
+    currentPage = page;
+    renderCourses();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  function paginateCourses(courses, page = 1, pageSize = 6) {
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize;
+    const paginatedCourses = courses.slice(start, end);
+    const totalPages = Math.ceil(courses.length / pageSize);
+
+    return {
+      courses: paginatedCourses,
+      currentPage: page,
+      totalPages,
+    };
+  }
+
+  searchInput.addEventListener('input', applyFilters);
+  difficultyCheckboxes.forEach(cb => cb.addEventListener('change', applyFilters));
+  categoryFilter.addEventListener('change', applyFilters);
+
+  // Renderizar inicial
+  renderCourses();
+</script>

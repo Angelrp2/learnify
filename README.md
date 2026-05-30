@@ -130,6 +130,8 @@ Diseño responsive que funciona desde 360px hasta pantallas grandes.
 
 SEO completo con meta tags, URLs amigables, sitemap dinámico y robots.txt.
 
+API externa integrada. La página de recursos consume la GitHub API en tiempo real para mostrar repositorios educativos con ejemplos de código. Esto enriquece la experiencia del usuario con contenido real de la comunidad.
+
 ## Conceptos JavaScript Implementados
 
 El proyecto usa todos los conceptos requeridos:
@@ -163,6 +165,10 @@ Las URLs son amigables usando slugs generados automáticamente desde los título
 El HTML es semántico usando header, main, footer, article y otras etiquetas apropiadas.
 
 Se incluyen Open Graph tags para compartir en redes sociales.
+
+## API Externa Integrada
+
+La página de recursos consume la GitHub API en tiempo real para mostrar repositorios educativos. Busca repositorios etiquetados con javascript-tutorial ordenados por popularidad. Esto proporciona ejemplos reales de código que complementan el contenido educativo. La integración incluye manejo de errores con try/catch y muestra información como estrellas, forks e issues abiertos.
 
 ## Despliegue
 
