@@ -1,80 +1,71 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Card from '../components/Card.astro';
+import Section from '../components/Section.astro';
+import Container from '../components/Container.astro';
+import { fetchCourses, fetchCategories } from '../lib/api.js';
 
 const title = 'Learnify - Aprende Programación Online';
 const description = 'Plataforma de cursos online para aprender programación desde cero';
+
+const [courses, categories] = await Promise.all([fetchCourses(), fetchCategories()]);
+const featuredCourses = courses.slice(0, 6);
 ---
 
 <BaseLayout title={title} description={description}>
-  <main>
-    <section class="hero">
-      <div class="container">
-        <h1>Aprende Programación Online</h1>
-        <p>Cursos profesionales diseñados para tu desarrollo como programador</p>
-        <a href="/cursos" class="btn btn-primary">Explorar Cursos</a>
-      </div>
-    </section>
+  <main class="flex-1">
+    <Section class="py-24 text-center bg-gradient-to-br from-blue-600 to-blue-900 text-white">
+      <Container size="md">
+        <h1 class="text-5xl font-bold mb-4">Aprende Programación Online</h1>
+        <p class="text-xl mb-8 opacity-90">Cursos profesionales diseñados para tu desarrollo como programador</p>
+        <a
+          href="/cursos"
+          class="inline-block px-8 py-4 bg-white text-blue-700 font-semibold rounded-lg hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200 no-underline"
+        >
+          Explorar Cursos
+        </a>
+      </Container>
+    </Section>
 
-    <section class="featured">
-      <div class="container">
-        <h2>Cursos Destacados</h2>
-        <p>Cargando cursos...</p>
-      </div>
-    </section>
+    <Section class="py-16">
+      <Container>
+        <h2 class="text-3xl font-bold mb-8 text-text-base">Cursos Destacados</h2>
+
+        {
+          featuredCourses.length > 0 ? (
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredCourses.map((course: any) => (
+                <Card
+                  title={course.attributes?.title ?? course.title ?? 'Sin título'}
+                  description={course.attributes?.description ?? course.description}
+                  image={course.attributes?.image?.data?.attributes?.url}
+                  href={`/cursos/${course.attributes?.slug ?? course.slug}`}
+                />
+              ))}
+            </div>
+          ) : (
+            <p class="text-text-muted">No hay cursos disponibles en este momento.</p>
+          )
+        }
+
+        {
+          categories.length > 0 && (
+            <div class="mt-12">
+              <h3 class="text-xl font-semibold mb-4 text-text-base">Categorías</h3>
+              <div class="flex flex-wrap gap-2">
+                {categories.map((cat: any) => (
+                  <a
+                    href={`/categorias`}
+                    class="px-3 py-1 bg-bg-muted border border-border rounded-full text-sm text-text-muted hover:text-primary hover:border-primary transition-colors no-underline"
+                  >
+                    {cat.attributes?.name ?? cat.name}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )
+        }
+      </Container>
+    </Section>
   </main>
 </BaseLayout>
-
-<style>
-  .hero {
-    padding: 6rem 2rem;
-    text-align: center;
-    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-    color: white;
-  }
-
-  .hero h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-  }
-
-  .hero p {
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
-    opacity: 0.9;
-  }
-
-  .featured {
-    padding: 4rem 2rem;
-  }
-
-  .featured h2 {
-    font-size: 2rem;
-    margin-bottom: 2rem;
-  }
-
-  .btn {
-    display: inline-block;
-    padding: 0.75rem 1.5rem;
-    background-color: white;
-    color: #2563eb;
-    text-decoration: none;
-    border-radius: 0.5rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-  }
-
-  .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-
-  @media (max-width: 768px) {
-    .hero h1 {
-      font-size: 2rem;
-    }
-
-    .hero p {
-      font-size: 1rem;
-    }
-  }
-</style>

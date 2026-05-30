@@ -1,11 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Button from '../components/Button.astro';
+import Section from '../components/Section.astro';
+import Container from '../components/Container.astro';
 ---
 
 <BaseLayout title="Contacto | Learnify" description="Ponte en contacto con nosotros">
-  <main>
-    <div class="container">
+  <main class="flex-1">
+    <Section class="py-8">
+      <Container>
       <h1>Contacto</h1>
       
       <div class="contact-section">
@@ -84,7 +87,8 @@ import Button from '../components/Button.astro';
           <p>Responderemos a tu mensaje en un plazo máximo de 48 horas.</p>
         </div>
       </div>
-    </div>
+      </Container>
+    </Section>
   </main>
 </BaseLayout>
 
