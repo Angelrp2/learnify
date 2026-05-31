@@ -15,15 +15,19 @@ Plataforma de cursos online construida con Astro, Strapi y Tailwind CSS. Proyect
 ### Requisitos
 
 - **Node.js 18** (recomendado exactamente v18 por compatibilidad con better-sqlite3)
-- npm (incluido con Node.js)
+- pnpm
 
 ### Instalacion
 
-
-
 **Terminal 1 - Strapi (backend):**
 
+```bash
+cd strapi
+pnpm install
+pnpm run dev
+```
 
+> Si pnpm falla con errores SSL, usa: npm install
 
 Al arrancar por primera vez, ve a http://localhost:1337/admin, crea tu cuenta y configura los permisos publicos:
 
@@ -36,7 +40,11 @@ El servidor siembra datos automaticamente en el primer arranque: 3 categorias, 6
 
 **Terminal 2 - Astro (frontend):**
 
-
+```bash
+cd astro
+pnpm install
+pnpm run dev
+```
 
 Accede a http://localhost:4321
 
@@ -83,3 +91,4 @@ Accede a http://localhost:4321
 ## Autor
 
 Angel Rios - Estudiante de DAW 2 en DIGITECH FP
+
