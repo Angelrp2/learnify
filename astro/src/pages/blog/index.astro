@@ -29,16 +29,16 @@ function getImageUrl(image: any): string | null {
     <Section class="py-12">
       <Container>
         <div class="mb-12">
-          <h1 class="text-4xl font-bold text-text-base mb-3">Blog</h1>
-          <p class="text-lg text-text-muted">Artículos educativos sobre programación y desarrollo web</p>
+          <h1 class="text-3xl sm:text-4xl font-bold text-text-base mb-3">Blog</h1>
+          <p class="text-base sm:text-lg text-text-muted">Artículos educativos sobre programación y desarrollo web</p>
         </div>
 
         {posts.length === 0 ? (
-          <div class="py-16 text-center">
-            <p class="text-text-muted text-lg">No hay artículos disponibles</p>
+          <div class="py-12 sm:py-16 text-center">
+            <p class="text-text-muted text-base sm:text-lg">No hay artículos disponibles</p>
           </div>
         ) : (
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {posts.map(post => {
               const { attributes } = post;
               const readingTime = calculateReadingTime(attributes.content);
@@ -47,7 +47,7 @@ function getImageUrl(image: any): string | null {
               return (
                 <article class="group bg-bg-muted rounded-lg overflow-hidden border border-border transition-all duration-300 hover:-translate-y-1 hover:shadow-lg flex flex-col">
                   {imageUrl && (
-                    <div class="relative h-44 sm:h-48 overflow-hidden bg-bg-muted">
+                    <div class="relative h-40 sm:h-44 md:h-48 overflow-hidden bg-bg-muted">
                       <img
                         src={imageUrl}
                         alt={attributes.title}
@@ -56,28 +56,28 @@ function getImageUrl(image: any): string | null {
                     </div>
                   )}
 
-                  <div class="p-4 sm:p-6 flex flex-col flex-1">
-                    <div class="flex items-center gap-2 mb-3 flex-wrap">
+                  <div class="p-3 sm:p-4 md:p-6 flex flex-col flex-1">
+                    <div class="flex items-center gap-2 mb-2 sm:mb-3 flex-wrap">
                       {attributes.category?.data && (
-                        <span class="inline-block px-3 py-1 bg-primary text-white text-xs font-medium rounded">
+                        <span class="inline-block px-2 sm:px-3 py-0.5 sm:py-1 bg-primary text-white text-xs font-medium rounded">
                           {attributes.category.data.attributes.name}
                         </span>
                       )}
-                      <span class="text-xs text-text-muted">{readingTime} min de lectura</span>
+                      <span class="text-xs text-text-muted">{readingTime} min</span>
                     </div>
                     
-                    <h2 class="text-xl font-semibold text-text-base mb-2 line-clamp-2">
+                    <h2 class="text-lg sm:text-xl font-semibold text-text-base mb-2 line-clamp-2">
                       <a href={`/blog/${attributes.slug}`} class="hover:text-primary transition-colors no-underline">
                         {attributes.title}
                       </a>
                     </h2>
                     
-                    <p class="text-text-muted text-sm mb-4 line-clamp-3 flex-1">
+                    <p class="text-text-muted text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-3 flex-1">
                       {attributes.excerpt || attributes.description}
                     </p>
                     
-                    <div class="flex items-center justify-between pt-4 border-t border-border">
-                      <div class="flex items-center gap-2 text-xs text-text-muted">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-3 sm:pt-4 border-t border-border gap-2 sm:gap-0">
+                      <div class="flex flex-wrap items-center gap-1 sm:gap-2 text-xs text-text-muted">
                         {attributes.author?.data && (
                           <span>Por {attributes.author.data.attributes.name}</span>
                         )}
@@ -93,7 +93,7 @@ function getImageUrl(image: any): string | null {
                       </div>
                       <a 
                         href={`/blog/${attributes.slug}`} 
-                        class="text-primary font-medium text-sm hover:text-blue-700 transition-colors no-underline"
+                        class="text-primary font-medium text-xs sm:text-sm hover:text-blue-700 transition-colors no-underline"
                       >
                         Leer →
                       </a>

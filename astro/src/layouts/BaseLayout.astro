@@ -43,15 +43,15 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
   </head>
   <body class="bg-bg-base text-text-base flex flex-col min-h-screen">
     <header class="bg-bg-muted border-b border-border sticky top-0 z-50">
-      <nav class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-        <a href="/" class="text-xl font-bold text-primary no-underline">Learnify</a>
+      <nav class="max-w-7xl mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between">
+        <a href="/" class="text-lg sm:text-xl font-bold text-primary no-underline">Learnify</a>
 
         <!-- Desktop links -->
-        <ul class="hidden md:flex items-center gap-6 list-none m-0 p-0">
-          <li><a href="/cursos" class="text-text-base no-underline hover:text-primary transition-colors">Cursos</a></li>
-          <li><a href="/categorias" class="text-text-base no-underline hover:text-primary transition-colors">Categorías</a></li>
-          <li><a href="/blog" class="text-text-base no-underline hover:text-primary transition-colors">Blog</a></li>
-          <li><a href="/contacto" class="text-text-base no-underline hover:text-primary transition-colors">Contacto</a></li>
+        <ul class="hidden md:flex items-center gap-4 lg:gap-6 list-none m-0 p-0">
+          <li><a href="/cursos" class="text-sm lg:text-base text-text-base no-underline hover:text-primary transition-colors">Cursos</a></li>
+          <li><a href="/categorias" class="text-sm lg:text-base text-text-base no-underline hover:text-primary transition-colors">Categorías</a></li>
+          <li><a href="/blog" class="text-sm lg:text-base text-text-base no-underline hover:text-primary transition-colors">Blog</a></li>
+          <li><a href="/contacto" class="text-sm lg:text-base text-text-base no-underline hover:text-primary transition-colors">Contacto</a></li>
           <li>
             <button
               id="theme-toggle"
@@ -111,9 +111,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
     <slot />
 
-    <footer class="bg-bg-muted border-t border-border py-8 text-center text-text-muted mt-auto">
-      <div class="max-w-7xl mx-auto px-4">
-        <p>Copyright 2024 Learnify. Todos los derechos reservados.</p>
+    <footer class="bg-bg-muted border-t border-border py-6 sm:py-8 text-center text-text-muted mt-auto">
+      <div class="max-w-7xl mx-auto px-3 sm:px-4">
+        <p class="text-xs sm:text-sm">Copyright 2024 Learnify. Todos los derechos reservados.</p>
       </div>
     </footer>
 

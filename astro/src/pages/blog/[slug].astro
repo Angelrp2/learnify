@@ -1,236 +1,164 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Section from '../../components/Section.astro';
+import Container from '../../components/Container.astro';
 import Button from '../../components/Button.astro';
 import { fetchBlogPosts } from '../../lib/api';
 import { calculateReadingTime } from '../../lib/utils';
 
-const { slug } = Astro.params;
-const posts = await fetchBlogPosts();
-const post = posts.find(p => p.attributes.slug === slug);
+const STRAPI_URL = (import.meta.env.STRAPI_URL || 'http://127.0.0.1:1337').trim();
 
-if (!post) {
-  return Astro.redirect('/404');
+function getImageUrl(image: any): string | null {
+  if (!image) return null;
+  if (typeof image === 'string') return image.startsWith('http') ? image : `${STRAPI_URL}${image}`;
+  if (image?.data?.attributes?.url) {
+    const url = image.data.attributes.url;
+    return url.startsWith('http') ? url : `${STRAPI_URL}${url}`;
+  }
+  return null;
 }
 
+const { slug } = Astro.params;
+const posts = await fetchBlogPosts();
+const post = posts.find((p: any) => p.attributes.slug === slug);
+
+if (!post) return Astro.redirect('/404');
+
 const { attributes } = post;
-const title = attributes.seo?.metaTitle || `${attributes.title} | Learnify`;
-const description = attributes.seo?.metaDescription || attributes.excerpt;
+const title = attributes.seoTitle || `${attributes.title} | Learnify`;
+const description = attributes.seoDescription || attributes.excerpt;
 const readingTime = calculateReadingTime(attributes.content);
+const imageUrl = getImageUrl(attributes.image);
 ---
 
 <BaseLayout title={title} description={description}>
-  <main>
-    <div class="container">
-      <div class="breadcrumb">
-        <a href="/blog">Blog</a>
-        <span>/</span>
-        <span>{attributes.title}</span>
+  <main class="flex-1">
+    {imageUrl && (
+      <div class="w-full h-48 sm:h-64 md:h-80 overflow-hidden bg-bg-muted">
+        <img src={imageUrl} alt={attributes.title} class="w-full h-full object-cover" />
       </div>
+    )}
 
-      <article class="blog-post">
-        <header class="post-header">
-          {attributes.image && (
-            <img src={attributes.image} alt={attributes.title} class="post-image" />
-          )}
-          <div class="post-meta">
-            <h1>{attributes.title}</h1>
-            <div class="post-info">
+    <Section class="py-8 sm:py-12">
+      <Container size="md">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-1.5 text-xs sm:text-sm text-text-muted mb-6 sm:mb-8 flex-wrap">
+          <a href="/blog" class="text-primary hover:text-blue-700 transition-colors no-underline">Blog</a>
+          <span>/</span>
+          <span class="truncate max-w-[200px] sm:max-w-none">{attributes.title}</span>
+        </nav>
+
+        <article>
+          <!-- Header -->
+          <header class="mb-6 sm:mb-10">
+            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-base mb-4 leading-tight">
+              {attributes.title}
+            </h1>
+
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-4">
               {attributes.category?.data && (
-                <span class="category">{attributes.category.data.attributes.name}</span>
+                <span class="inline-block px-2.5 sm:px-3 py-1 bg-primary text-white text-xs sm:text-sm font-medium rounded">
+                  {attributes.category.data.attributes.name}
+                </span>
               )}
-              <span class="reading-time">{readingTime} minutos de lectura</span>
+              <span class="text-xs sm:text-sm text-text-muted">{readingTime} min de lectura</span>
               {attributes.publishedAt && (
-                <span class="date">
+                <span class="text-xs sm:text-sm text-text-muted">
                   {new Date(attributes.publishedAt).toLocaleDateString('es-ES', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
+                    year: 'numeric', month: 'long', day: 'numeric'
                   })}
                 </span>
               )}
             </div>
+
             {attributes.author?.data && (
-              <div class="author">
-                <p>Por: <strong>{attributes.author.data.attributes.name}</strong></p>
+              <div class="flex items-center gap-2 pt-4 border-t border-border">
+                <span class="text-sm text-text-muted">
+                  Por <strong class="text-text-base">{attributes.author.data.attributes.name}</strong>
+                </span>
               </div>
             )}
-          </div>
-        </header>
+          </header>
 
-        <div class="post-content">
-          <div set:html={attributes.content}></div>
-        </div>
+          <!-- Content -->
+          <div class="prose-content text-text-base leading-relaxed" set:html={attributes.content} />
 
-        <footer class="post-footer">
-          <Button href="/blog">Volver al Blog</Button>
-        </footer>
-      </article>
-    </div>
+          <!-- Footer -->
+          <footer class="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-border">
+            <Button href="/blog" variant="outline">← Volver al Blog</Button>
+          </footer>
+        </article>
+      </Container>
+    </Section>
   </main>
 </BaseLayout>
 
 <style>
-  .breadcrumb {
-    margin: 1rem 0;
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-  }
-
-  .breadcrumb a {
-    color: var(--color-primary);
-    text-decoration: none;
-  }
-
-  .breadcrumb a:hover {
-    text-decoration: underline;
-  }
-
-  .breadcrumb span {
-    margin: 0 0.5rem;
-  }
-
-  .blog-post {
-    margin: 2rem 0;
-    max-width: 800px;
-  }
-
-  .post-header {
-    background-color: var(--bg-secondary);
-    padding: 2rem;
-    border-radius: 0.5rem;
-    margin-bottom: 2rem;
-    border: 1px solid var(--border);
-  }
-
-  .post-image {
-    width: 100%;
-    max-height: 400px;
-    object-fit: cover;
-    border-radius: 0.5rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .post-header h1 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .post-info {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
-  }
-
-  .category {
-    display: inline-block;
-    background-color: var(--color-primary);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.25rem;
-  }
-
-  .reading-time,
-  .date {
-    display: inline-block;
-    color: var(--text-secondary);
-  }
-
-  .author {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border);
-  }
-
-  .author p {
-    margin: 0;
-    color: var(--text-secondary);
-  }
-
-  .post-content {
-    background-color: var(--bg-primary);
-    padding: 2rem 0;
+  .prose-content {
+    font-size: clamp(0.95rem, 2.5vw, 1.05rem);
     line-height: 1.8;
   }
-
-  .post-content :global(h2) {
-    font-size: 1.75rem;
-    margin: 2rem 0 1rem;
+  .prose-content :global(h2) {
+    font-size: clamp(1.2rem, 4vw, 1.75rem);
+    font-weight: 700;
+    margin: 2rem 0 0.75rem;
+    color: var(--text-base);
   }
-
-  .post-content :global(h3) {
-    font-size: 1.25rem;
-    margin: 1.5rem 0 0.75rem;
+  .prose-content :global(h3) {
+    font-size: clamp(1rem, 3vw, 1.25rem);
+    font-weight: 600;
+    margin: 1.5rem 0 0.5rem;
+    color: var(--text-base);
   }
-
-  .post-content :global(p) {
+  .prose-content :global(p) {
     margin-bottom: 1rem;
+    color: var(--text-muted);
   }
-
-  .post-content :global(ul),
-  .post-content :global(ol) {
+  .prose-content :global(ul),
+  .prose-content :global(ol) {
     margin: 1rem 0;
-    padding-left: 2rem;
+    padding-left: 1.5rem;
+    color: var(--text-muted);
   }
-
-  .post-content :global(li) {
-    margin-bottom: 0.5rem;
+  .prose-content :global(li) {
+    margin-bottom: 0.4rem;
   }
-
-  .post-content :global(blockquote) {
-    border-left: 4px solid var(--color-primary);
+  .prose-content :global(blockquote) {
+    border-left: 4px solid var(--primary);
     padding-left: 1rem;
-    margin: 1rem 0;
-    color: var(--text-secondary);
+    margin: 1.25rem 0;
+    color: var(--text-muted);
     font-style: italic;
   }
-
-  .post-content :global(code) {
-    background-color: var(--bg-secondary);
-    padding: 0.2rem 0.4rem;
+  .prose-content :global(code) {
+    background-color: var(--bg-muted);
+    padding: 0.15rem 0.4rem;
     border-radius: 0.25rem;
     font-family: 'Courier New', monospace;
-    font-size: 0.9em;
+    font-size: 0.875em;
+    color: var(--text-base);
   }
-
-  .post-content :global(pre) {
-    background-color: var(--bg-secondary);
+  .prose-content :global(pre) {
+    background-color: var(--bg-muted);
+    border: 1px solid var(--border);
     padding: 1rem;
     border-radius: 0.5rem;
     overflow-x: auto;
-    margin: 1rem 0;
+    margin: 1.25rem 0;
   }
-
-  .post-content :global(a) {
-    color: var(--color-primary);
-    text-decoration: none;
+  .prose-content :global(pre code) {
+    background: none;
+    padding: 0;
+    font-size: 0.875rem;
   }
-
-  .post-content :global(a:hover) {
+  .prose-content :global(a) {
+    color: var(--primary);
     text-decoration: underline;
   }
-
-  .post-footer {
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border);
-  }
-
-  @media (max-width: 768px) {
-    .post-header h1 {
-      font-size: 1.75rem;
-    }
-
-    .post-info {
-      flex-direction: column;
-    }
-
-    .category,
-    .reading-time,
-    .date {
-      display: block;
-      width: 100%;
-    }
+  .prose-content :global(img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
   }
 </style>
