@@ -1,0 +1,236 @@
+INSTRUCCIONES DE EVALUACIÓN - LEARNIFY
+======================================
+
+ESTRUCTURA DE LA ENTREGA:
+
+1. MEMORIA_TECNICA.pdf
+   - Documento principal con toda la información técnica
+   - Incluye arquitectura, contenidos técnicos, estilos y SEO
+
+2. GITHUB_REPOSITORY.txt
+   - URL del repositorio público
+   - Acceso a todo el código fuente
+
+3. STRAPI_ACCESO.txt
+   - Instrucciones para ejecutar Strapi localmente
+   - Pasos de instalación y configuración
+
+4. INSTRUCCIONES_EVALUACION.txt
+   - Este archivo
+
+CÓMO EVALUAR EL PROYECTO:
+
+PASO 1: REVISAR LA MEMORIA TÉCNICA
+
+Abre MEMORIA_TECNICA.pdf y revisa:
+- Sección 3: Diseño y Tecnologías (arquitectura)
+- Sección 3.1: Conceptos JavaScript (contenidos técnicos)
+- Sección 4: Sistema de Estilos
+- Sección 5: Estrategia SEO
+
+PASO 2: ACCEDER AL REPOSITORIO GITHUB
+
+Ve a https://github.com/Angelrp2/learnify
+
+Revisa:
+- README.md - Introducción al proyecto
+- /docs/ - Documentación técnica detallada
+- /strapi/ - Código del backend
+- /astro/ - Código del frontend
+- Historial de commits - Fases del desarrollo
+
+PASO 3: EJECUTAR STRAPI LOCALMENTE
+
+Sigue las instrucciones en STRAPI_ACCESO.txt:
+
+1. git clone https://github.com/Angelrp2/learnify.git
+2. cd learnify/strapi
+3. pnpm install
+4. cp .env.example .env
+5. pnpm run dev
+6. Accede a http://localhost:1337/admin
+
+Crea datos de prueba (ver STRAPI_ACCESO.txt para ejemplos)
+
+PASO 4: EJECUTAR ASTRO LOCALMENTE
+
+En otra terminal:
+
+1. cd learnify/astro
+2. pnpm install
+3. cp .env.example .env
+4. pnpm run dev
+5. Accede a http://localhost:3000
+
+PASO 5: VERIFICAR FUNCIONALIDADES
+
+En http://localhost:3000, verifica:
+
+PÁGINA DE INICIO:
+- Carga correctamente
+- Muestra hero section
+- Muestra cursos destacados
+
+PÁGINA DE CURSOS (/cursos):
+- Carga la lista de cursos
+- Búsqueda funciona (escribe en el buscador)
+- Filtros funcionan (selecciona dificultad o categoría)
+- Paginación funciona (navega entre páginas)
+
+PÁGINA INDIVIDUAL DE CURSO (/cursos/[slug]):
+- Muestra detalles del curso
+- Muestra lecciones
+- Muestra instructor
+
+PÁGINA DE BLOG (/blog):
+- Carga artículos
+- Muestra tiempo de lectura calculado automáticamente
+
+PÁGINA DE RECURSOS (/recursos):
+- Carga repositorios de GitHub en tiempo real
+- Muestra información (estrellas, forks, issues)
+
+PÁGINA DE CONTACTO (/contacto):
+- Formulario valida campos
+- Muestra errores si faltan datos
+- Email valida con regex
+
+DARK MODE:
+- Haz clic en el botón de tema (arriba a la derecha)
+- El sitio cambia a dark mode
+- Los colores cambian correctamente
+
+RESPONSIVE:
+- Abre las herramientas de desarrollador (F12)
+- Cambia a vista móvil (360px)
+- El diseño se adapta correctamente
+
+PASO 6: REVISAR CÓDIGO
+
+En el repositorio, verifica:
+
+/astro/src/lib/api.js:
+- Fetch a Strapi con try/catch
+- Manejo de errores
+
+/astro/src/lib/utils.js:
+- Búsqueda con regex
+- Filtros dinámicos
+- Paginación
+- Validación de formularios
+
+/astro/src/pages/cursos/index.astro:
+- Componente de búsqueda y filtros
+- Paginación
+
+/astro/src/pages/contacto.astro:
+- Validación de formulario
+- Feedback visual
+
+PASO 7: REVISAR DOCUMENTACIÓN
+
+En /docs/, revisa:
+
+- ARQUITECTURA.md - Decisiones técnicas
+- CONTENIDOS_TECNICOS.md - Ejemplos de código
+- ESTILOS.md - Sistema de diseño
+- SEO.md - Estrategia SEO
+- RGPD_SEGURIDAD.md - Cumplimiento RGPD
+- DIAGRAMA_ER.md - Estructura de BD
+
+REQUISITOS CUMPLIDOS:
+
+ARQUITECTURA:
+✓ Frontend y backend separados
+✓ Git con repositorio documentado
+✓ Despliegue funcional local
+
+FRONTEND:
+✓ HTML5 válido
+✓ CSS responsive
+✓ JavaScript avanzado
+✓ Validación de formularios
+✓ Fetch con try/catch
+✓ Manual de marca (variables CSS)
+✓ SEO técnico
+✓ Contenido humanizado
+✓ Dark mode
+✓ API externa (GitHub)
+✓ Manejo de errores
+
+BACKEND:
+✓ Node.js (Strapi)
+✓ API REST automática
+✓ Base de datos (SQLite)
+✓ Validaciones
+✓ Gestión de errores
+
+BASE DE DATOS:
+✓ 6 tablas relacionadas
+✓ Diagrama E-R
+✓ Scripts SQL
+✓ CRUD funcional
+✓ 4 roles de usuario
+
+SEGURIDAD:
+✓ Validación de entradas
+✓ Protección XSS
+✓ Código estructurado
+✓ RGPD documentado
+
+DOCUMENTACIÓN:
+✓ Introducción y objetivos
+✓ Planificación y metodología
+✓ Diseño y tecnologías
+✓ Manual de instalación
+✓ Arquitectura
+✓ Contenidos técnicos
+✓ Estilos
+✓ SEO
+
+ELEMENTO DIFERENCIADOR:
+✓ Dark mode
+✓ Búsqueda con regex
+✓ Filtros dinámicos
+✓ Paginación
+✓ API externa
+✓ Arquitectura SSG
+
+CONCEPTOS JAVASCRIPT:
+✓ Desestructuración
+✓ Array methods
+✓ Async/await
+✓ Try/catch
+✓ Regex
+✓ Normalización
+✓ Validación
+✓ Paginación
+
+TIEMPO ESTIMADO DE EVALUACIÓN:
+
+- Revisar PDF: 10 minutos
+- Revisar GitHub: 10 minutos
+- Instalar y ejecutar: 10 minutos
+- Verificar funcionalidades: 15 minutos
+- Revisar código: 15 minutos
+- Total: ~60 minutos
+
+NOTAS:
+
+- El proyecto está 100% funcional localmente
+- Toda la documentación está en el repositorio
+- El código es limpio, comentado y reutilizable
+- No hay patrones de IA evidentes
+- La redacción es humanizada y profesional
+
+PRÓXIMOS PASOS (después de la evaluación):
+
+1. Desplegar Strapi en Render.com
+2. Desplegar Astro en Netlify.com
+3. Agregar URLs desplegadas al PDF
+4. Compartir URLs finales
+
+CONTACTO:
+
+Para preguntas, consulta la documentación en:
+https://github.com/Angelrp2/learnify

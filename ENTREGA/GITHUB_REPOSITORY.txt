@@ -1,0 +1,36 @@
+REPOSITORIO GITHUB - LEARNIFY
+=============================
+
+URL: https://github.com/Angelrp2/learnify
+
+ACCESO:
+
+El repositorio es público. Puedes acceder directamente desde el navegador.
+
+CONTENIDO DEL REPOSITORIO:
+
+/strapi/          - Backend (Strapi CMS)
+/astro/           - Frontend (Astro SSG)
+/docs/            - Documentación técnica
+README.md         - Introducción al proyecto
+ESQUEMA_DATOS_STRAPI.md - Estructura de la base de datos
+MANUAL_INSTALACION.md - Instrucciones detalladas
+
+DOCUMENTACIÓN DISPONIBLE EN /docs/:
+
+- ARQUITECTURA.md - Decisiones arquitectónicas
+- CONTENIDOS_TECNICOS.md - Conceptos JavaScript aplicados
+- ESTILOS.md - Sistema de diseño
+- SEO.md - Estrategia SEO
+- RGPD_SEGURIDAD.md - Cumplimiento RGPD
+- DIAGRAMA_ER.md - Diagrama entidad-relación
+- MANUAL_INSTALACION.md - Pasos de instalación
+
+COMMITS:
+
+Todos los commits están documentados en el historial de Git.
+Cada commit representa una fase del desarrollo.
+
+RAMA PRINCIPAL:
+
+main - Rama principal con código estable
