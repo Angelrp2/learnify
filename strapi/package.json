@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Backend Strapi para Learnify",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "dev": "strapi develop",
     "build": "strapi build",
@@ -11,11 +10,15 @@
     "strapi": "strapi"
   },
   "dependencies": {
-    "@strapi/strapi": "^4.25.0",
-    "@strapi/plugin-users-permissions": "^4.25.0",
     "@strapi/plugin-i18n": "^4.25.0",
+    "@strapi/plugin-users-permissions": "^4.25.0",
+    "@strapi/strapi": "^4.25.0",
     "better-sqlite3": "^9.2.2",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^5.2.0",
+    "styled-components": "^5.2.1"
   },
   "devDependencies": {
     "@types/node": "^20.10.6"

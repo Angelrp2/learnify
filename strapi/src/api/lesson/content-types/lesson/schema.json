@@ -27,8 +27,7 @@
     "course": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "api::course.course",
-      "inversedBy": "lessons"
+      "target": "api::course.course"
     }
   }
 }

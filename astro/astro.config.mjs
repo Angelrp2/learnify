@@ -3,7 +3,7 @@ import tailwind from '@astrojs/tailwind';
 
 export default defineConfig({
   site: 'https://learnify.netlify.app',
-  output: 'static',
+  output: 'server',
   integrations: [tailwind({ applyBaseStyles: false })],
   vite: {
     ssr: {
@@ -11,3 +11,4 @@ export default defineConfig({
     },
   },
 });
+

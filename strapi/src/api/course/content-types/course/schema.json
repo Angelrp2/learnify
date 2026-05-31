@@ -55,14 +55,12 @@
     "category": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "api::category.category",
-      "inversedBy": "courses"
+      "target": "api::category.category"
     },
     "instructor": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "api::instructor.instructor",
-      "inversedBy": "courses"
+      "target": "api::instructor.instructor"
     }
   }
 }
