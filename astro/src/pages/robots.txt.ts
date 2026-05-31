@@ -1,6 +1,4 @@
-export const prerender = true;
-
-export default function GET() {
+export async function GET() {
   return new Response(`User-agent: *
 Allow: /
 Disallow: /admin
