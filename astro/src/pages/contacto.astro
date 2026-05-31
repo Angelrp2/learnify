@@ -8,18 +8,18 @@ const strapiUrl = (import.meta.env.STRAPI_URL || 'http://127.0.0.1:1337').trim()
 
 <BaseLayout title="Contacto | Learnify" description="Ponte en contacto con nosotros">
   <main class="flex-1">
-    <Section class="py-16">
+    <Section class="py-10 sm:py-16">
       <Container size="lg">
-        <div class="mb-10">
-          <h1 class="text-4xl font-bold text-text-base mb-2">Contacto</h1>
-          <p class="text-text-muted text-lg">
+        <div class="mb-6 sm:mb-10">
+          <h1 class="text-2xl sm:text-4xl font-bold text-text-base mb-2">Contacto</h1>
+          <p class="text-text-muted text-base sm:text-lg">
             Estamos aquí para ayudarte. Responderemos en menos de 48 horas.
           </p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-10">
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-10">
           <!-- Form card -->
-          <div class="lg:col-span-3 bg-bg-muted border border-border rounded-xl p-8">
+          <div class="lg:col-span-3 bg-bg-muted border border-border rounded-xl p-5 sm:p-8">
             <!-- Success banner -->
             <div
               id="successBanner"

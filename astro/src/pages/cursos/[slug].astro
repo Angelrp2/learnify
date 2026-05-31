@@ -56,10 +56,10 @@ const difficultyStyle = difficultyColors[difficulty as keyof typeof difficultyCo
       </div>
     )}
 
-    <Section class="py-12">
+    <Section class="py-8 sm:py-12">
       <Container>
         {/* Breadcrumb */}
-        <nav class="flex items-center gap-2 text-sm text-text-muted mb-8">
+        <nav class="flex items-center gap-2 text-sm text-text-muted mb-6 sm:mb-8">
           <a href="/cursos" class="text-primary hover:text-blue-700 transition-colors no-underline">Cursos</a>
           <span>/</span>
           <span class="text-text-base">{attributes.title}</span>
@@ -70,7 +70,7 @@ const difficultyStyle = difficultyColors[difficulty as keyof typeof difficultyCo
           <div class="lg:col-span-2">
             {/* Título y meta */}
             <div class="mb-8">
-              <h1 class="text-4xl font-bold text-text-base mb-4 leading-tight">
+              <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-base mb-4 leading-tight">
                 {attributes.title}
               </h1>
               
