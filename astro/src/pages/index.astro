@@ -65,7 +65,7 @@ const featuredCourses = courses.slice(0, 6);
                 <Card
                   title={course.attributes?.title ?? course.title ?? 'Sin título'}
                   description={course.attributes?.description ?? course.description}
-                  image={course.attributes?.image?.data?.attributes?.url}
+                  image={course.attributes?.image}
                   href={`/cursos/${course.attributes?.slug ?? course.slug}`}
                 />
               ))}

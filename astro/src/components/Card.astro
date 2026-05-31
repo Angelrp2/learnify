@@ -8,12 +8,28 @@ interface Props {
 }
 
 const { title, description, image, href, class: className = '' } = Astro.props;
+
+const STRAPI_URL = import.meta.env.STRAPI_URL || 'http://localhost:1337';
+
+function getImageUrl(img: any): string | null {
+  if (!img) return null;
+  if (typeof img === 'string') {
+    return img.startsWith('http') ? img : `${STRAPI_URL}${img}`;
+  }
+  if (typeof img === 'object' && img.data?.attributes?.url) {
+    const url = img.data.attributes.url;
+    return url.startsWith('http') ? url : `${STRAPI_URL}${url}`;
+  }
+  return null;
+}
+
+const imageUrl = getImageUrl(image);
 ---
 
 <div
   class={`bg-bg-muted rounded-lg overflow-hidden transition-all duration-300 border border-border hover:-translate-y-1 hover:shadow-xl ${className}`}
 >
-  {image && <img src={image} alt={title} class="w-full h-48 object-cover" />}
+  {imageUrl && <img src={imageUrl} alt={title} class="w-full h-48 object-cover" />}
   <div class="p-6">
     <h3 class="text-lg font-semibold mb-2 text-text-base">{title}</h3>
     {description && <p class="text-text-muted mb-4 leading-relaxed text-sm">{description}</p>}

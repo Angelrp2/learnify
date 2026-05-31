@@ -11,10 +11,16 @@ const STRAPI_URL = import.meta.env.STRAPI_URL || 'http://localhost:1337';
 const title = 'Blog | Learnify';
 const description = 'Artículos educativos sobre programación y desarrollo web';
 
-function getImageUrl(image: string | undefined): string | null {
+function getImageUrl(image: any): string | null {
   if (!image) return null;
-  if (image.startsWith('http')) return image;
-  return `${STRAPI_URL}${image}`;
+  if (typeof image === 'string') {
+    return image.startsWith('http') ? image : `${STRAPI_URL}${image}`;
+  }
+  if (typeof image === 'object' && image.data?.attributes?.url) {
+    const url = image.data.attributes.url;
+    return url.startsWith('http') ? url : `${STRAPI_URL}${url}`;
+  }
+  return null;
 }
 ---
 
