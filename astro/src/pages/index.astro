@@ -4,6 +4,7 @@ import Card from '../components/Card.astro';
 import Section from '../components/Section.astro';
 import Container from '../components/Container.astro';
 import { fetchCourses, fetchCategories } from '../lib/api.js';
+import { slugify } from '../lib/utils.js';
 
 const title = 'Learnify - Aprende Programación Online';
 const description = 'Plataforma de cursos online para aprender programación desde cero';
@@ -16,20 +17,46 @@ const featuredCourses = courses.slice(0, 6);
   <main class="flex-1">
     <Section class="py-24 text-center bg-gradient-to-br from-blue-600 to-blue-900 text-white">
       <Container size="md">
-        <h1 class="text-5xl font-bold mb-4">Aprende Programación Online</h1>
-        <p class="text-xl mb-8 opacity-90">Cursos profesionales diseñados para tu desarrollo como programador</p>
-        <a
-          href="/cursos"
-          class="inline-block px-8 py-4 bg-white text-blue-700 font-semibold rounded-lg hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200 no-underline"
-        >
-          Explorar Cursos
-        </a>
+        <span class="inline-block px-4 py-1 bg-white/20 text-white text-sm font-medium rounded-full mb-6">
+          Plataforma de aprendizaje profesional
+        </span>
+        <h1 class="text-5xl font-bold mb-4 leading-tight">
+          Aprende Programación Online
+        </h1>
+        <p class="text-xl mb-10 opacity-90 max-w-xl mx-auto">
+          Cursos profesionales diseñados para tu desarrollo como programador, desde cero hasta experto.
+        </p>
+        <div class="flex items-center justify-center gap-4 flex-wrap">
+          <a
+            href="/cursos"
+            class="inline-block px-8 py-4 bg-white text-blue-700 font-semibold rounded-lg hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200 no-underline"
+          >
+            Explorar Cursos
+          </a>
+          <a
+            href="/categorias"
+            class="inline-block px-8 py-4 bg-transparent text-white font-semibold rounded-lg border-2 border-white hover:bg-white hover:text-blue-700 hover:-translate-y-0.5 transition-all duration-200 no-underline"
+          >
+            Ver Categorías
+          </a>
+        </div>
       </Container>
     </Section>
 
     <Section class="py-16">
       <Container>
-        <h2 class="text-3xl font-bold mb-8 text-text-base">Cursos Destacados</h2>
+        <div class="flex items-center justify-between mb-8">
+          <div>
+            <h2 class="text-3xl font-bold text-text-base">Cursos Destacados</h2>
+            <p class="text-text-muted mt-1">Los cursos más populares de nuestra plataforma</p>
+          </div>
+          <a
+            href="/cursos"
+            class="text-primary font-medium hover:text-blue-700 transition-colors no-underline text-sm"
+          >
+            Ver todos →
+          </a>
+        </div>
 
         {
           featuredCourses.length > 0 ? (
@@ -47,25 +74,42 @@ const featuredCourses = courses.slice(0, 6);
             <p class="text-text-muted">No hay cursos disponibles en este momento.</p>
           )
         }
-
-        {
-          categories.length > 0 && (
-            <div class="mt-12">
-              <h3 class="text-xl font-semibold mb-4 text-text-base">Categorías</h3>
-              <div class="flex flex-wrap gap-2">
-                {categories.map((cat: any) => (
-                  <a
-                    href={`/categorias`}
-                    class="px-3 py-1 bg-bg-muted border border-border rounded-full text-sm text-text-muted hover:text-primary hover:border-primary transition-colors no-underline"
-                  >
-                    {cat.attributes?.name ?? cat.name}
-                  </a>
-                ))}
-              </div>
-            </div>
-          )
-        }
       </Container>
     </Section>
+
+    {
+      categories.length > 0 && (
+        <Section class="py-16 bg-bg-muted border-t border-border">
+          <Container>
+            <div class="flex items-center justify-between mb-8">
+              <div>
+                <h2 class="text-3xl font-bold text-text-base">Categorías</h2>
+                <p class="text-text-muted mt-1">Explora los cursos por área temática</p>
+              </div>
+              <a
+                href="/categorias"
+                class="text-primary font-medium hover:text-blue-700 transition-colors no-underline text-sm"
+              >
+                Ver todas →
+              </a>
+            </div>
+            <div class="flex flex-wrap gap-3">
+              {categories.map((cat: any) => {
+                const name = cat.attributes?.name ?? cat.name ?? '';
+                const catSlug = cat.attributes?.slug ?? slugify(name);
+                return (
+                  <a
+                    href={`/categorias/${catSlug}`}
+                    class="px-5 py-2.5 bg-bg-base border border-border rounded-full text-sm font-medium text-text-base hover:text-primary hover:border-primary hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 no-underline"
+                  >
+                    {name}
+                  </a>
+                );
+              })}
+            </div>
+          </Container>
+        </Section>
+      )
+    }
   </main>
 </BaseLayout>
