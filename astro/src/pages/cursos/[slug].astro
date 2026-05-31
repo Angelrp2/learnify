@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Section from '../../components/Section.astro';
+import Container from '../../components/Container.astro';
 import Button from '../../components/Button.astro';
 import { fetchCourses, fetchCourseBySlug } from '../../lib/api';
 
@@ -13,269 +15,192 @@ if (!course) {
 const { attributes } = course;
 const title = attributes.seo?.metaTitle || `${attributes.title} | Learnify`;
 const description = attributes.seo?.metaDescription || attributes.description;
+
+const STRAPI_URL = import.meta.env.STRAPI_URL || 'http://localhost:1337';
+
+function getImageUrl(image: string | undefined): string | null {
+  if (!image) return null;
+  if (image.startsWith('http')) return image;
+  return `${STRAPI_URL}${image}`;
+}
+
+const imageUrl = getImageUrl(attributes.image?.data?.attributes?.url);
+
+const difficultyColors = {
+  beginner: { bg: 'bg-green-100', text: 'text-green-800', label: 'Principiante' },
+  intermediate: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Intermedio' },
+  advanced: { bg: 'bg-red-100', text: 'text-red-800', label: 'Avanzado' }
+};
+
+const difficulty = attributes.difficulty || 'beginner';
+const difficultyStyle = difficultyColors[difficulty as keyof typeof difficultyColors] || difficultyColors.beginner;
 ---
 
 <BaseLayout title={title} description={description}>
-  <main>
-    <div class="container">
-      <div class="breadcrumb">
-        <a href="/cursos">Cursos</a>
-        <span>/</span>
-        <span>{attributes.title}</span>
+  <main class="flex-1">
+    {/* Hero Section con imagen */}
+    {imageUrl && (
+      <div class="relative h-96 overflow-hidden bg-gradient-to-br from-blue-600 to-blue-900">
+        <img 
+          src={imageUrl} 
+          alt={attributes.title} 
+          class="w-full h-full object-cover opacity-60"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
       </div>
+    )}
 
-      <article class="course-detail">
-        <header class="course-header">
-          {attributes.image && (
-            <img src={attributes.image} alt={attributes.title} class="course-image" />
-          )}
-          <div class="course-meta">
-            <h1>{attributes.title}</h1>
-            <div class="course-info">
-              <span class="difficulty" data-level={attributes.difficulty}>
-                {attributes.difficulty}
-              </span>
-              <span class="duration">
-                {attributes.duration} minutos
-              </span>
-              {attributes.category?.data && (
-                <span class="category">
-                  {attributes.category.data.attributes.name}
+    <Section class="py-12">
+      <Container>
+        {/* Breadcrumb */}
+        <nav class="flex items-center gap-2 text-sm text-text-muted mb-8">
+          <a href="/cursos" class="text-primary hover:text-blue-700 transition-colors no-underline">Cursos</a>
+          <span>/</span>
+          <span class="text-text-base">{attributes.title}</span>
+        </nav>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Contenido principal */}
+          <div class="lg:col-span-2">
+            {/* Título y meta */}
+            <div class="mb-8">
+              <h1 class="text-4xl font-bold text-text-base mb-4 leading-tight">
+                {attributes.title}
+              </h1>
+              
+              <div class="flex flex-wrap items-center gap-3 mb-6">
+                <span class={`inline-block px-4 py-2 rounded-lg font-medium text-sm ${difficultyStyle.bg} ${difficultyStyle.text}`}>
+                  {difficultyStyle.label}
                 </span>
+                
+                {attributes.duration && (
+                  <span class="inline-flex items-center gap-2 px-4 py-2 bg-bg-muted rounded-lg text-text-base">
+                    <span>⏱️</span>
+                    <span>{attributes.duration} minutos</span>
+                  </span>
+                )}
+                
+                {attributes.category?.data && (
+                  <span class="inline-flex items-center gap-2 px-4 py-2 bg-bg-muted rounded-lg text-text-base">
+                    <span>📁</span>
+                    <span>{attributes.category.data.attributes.name}</span>
+                  </span>
+                )}
+              </div>
+
+              {attributes.instructor?.data && (
+                <div class="flex items-center gap-3 text-text-muted mb-6">
+                  <span class="text-2xl">👨‍🏫</span>
+                  <div>
+                    <p class="text-sm text-text-muted">Instructor</p>
+                    <p class="text-lg font-medium text-text-base">{attributes.instructor.data.attributes.name}</p>
+                  </div>
+                </div>
               )}
             </div>
-            {attributes.instructor?.data && (
-              <div class="instructor">
-                <p>Por: {attributes.instructor.data.attributes.name}</p>
-              </div>
-            )}
-          </div>
-        </header>
 
-        <div class="course-content">
-          <section class="description">
-            <h2>Descripción</h2>
-            <p>{attributes.description}</p>
-          </section>
-
-          <section class="content">
-            <h2>Contenido del Curso</h2>
-            <div set:html={attributes.content}></div>
-          </section>
-
-          {attributes.lessons?.data && attributes.lessons.data.length > 0 && (
-            <section class="lessons">
-              <h2>Lecciones</h2>
-              <ul class="lessons-list">
-                {attributes.lessons.data.map((lesson, index) => (
-                  <li>
-                    <span class="lesson-number">{index + 1}</span>
-                    <span class="lesson-title">{lesson.attributes.title}</span>
-                    {lesson.attributes.duration && (
-                      <span class="lesson-duration">{lesson.attributes.duration} min</span>
-                    )}
-                  </li>
-                ))}
-              </ul>
+            {/* Descripción */}
+            <section class="mb-12">
+              <h2 class="text-2xl font-bold text-text-base mb-4">Descripción</h2>
+              <p class="text-text-muted leading-relaxed text-lg">
+                {attributes.description}
+              </p>
             </section>
-          )}
 
-          <div class="course-actions">
-            <Button href="/cursos">Volver a Cursos</Button>
+            {/* Contenido del curso */}
+            {attributes.content && (
+              <section class="mb-12">
+                <h2 class="text-2xl font-bold text-text-base mb-4">Contenido del Curso</h2>
+                <div class="prose prose-invert max-w-none text-text-muted">
+                  <div set:html={attributes.content}></div>
+                </div>
+              </section>
+            )}
+
+            {/* Lecciones */}
+            {attributes.lessons?.data && attributes.lessons.data.length > 0 && (
+              <section class="mb-12">
+                <h2 class="text-2xl font-bold text-text-base mb-6">Lecciones del Curso</h2>
+                <div class="space-y-3">
+                  {attributes.lessons.data.map((lesson, index) => (
+                    <div class="flex items-start gap-4 p-4 bg-bg-muted rounded-lg border border-border hover:border-primary transition-colors">
+                      <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 bg-primary text-white rounded-full font-bold text-sm">
+                        {index + 1}
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <h3 class="text-lg font-semibold text-text-base">
+                          {lesson.attributes.title}
+                        </h3>
+                        {lesson.attributes.description && (
+                          <p class="text-sm text-text-muted mt-1">
+                            {lesson.attributes.description}
+                          </p>
+                        )}
+                      </div>
+                      {lesson.attributes.duration && (
+                        <div class="flex-shrink-0 text-sm text-text-muted whitespace-nowrap">
+                          {lesson.attributes.duration} min
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Botón de volver */}
+            <div class="pt-8 border-t border-border">
+              <Button href="/cursos" class="inline-block">← Volver a Cursos</Button>
+            </div>
           </div>
+
+          {/* Sidebar */}
+          <aside class="lg:col-span-1">
+            <div class="sticky top-24 bg-bg-muted rounded-lg border border-border p-6">
+              <h3 class="text-xl font-bold text-text-base mb-6">Información del Curso</h3>
+              
+              <div class="space-y-6">
+                <div>
+                  <p class="text-sm text-text-muted mb-2">Nivel de Dificultad</p>
+                  <span class={`inline-block px-4 py-2 rounded-lg font-medium text-sm ${difficultyStyle.bg} ${difficultyStyle.text}`}>
+                    {difficultyStyle.label}
+                  </span>
+                </div>
+
+                {attributes.duration && (
+                  <div>
+                    <p class="text-sm text-text-muted mb-2">Duración Total</p>
+                    <p class="text-lg font-semibold text-text-base">{attributes.duration} minutos</p>
+                  </div>
+                )}
+
+                {attributes.category?.data && (
+                  <div>
+                    <p class="text-sm text-text-muted mb-2">Categoría</p>
+                    <p class="text-lg font-semibold text-text-base">{attributes.category.data.attributes.name}</p>
+                  </div>
+                )}
+
+                {attributes.instructor?.data && (
+                  <div>
+                    <p class="text-sm text-text-muted mb-2">Instructor</p>
+                    <p class="text-lg font-semibold text-text-base">{attributes.instructor.data.attributes.name}</p>
+                  </div>
+                )}
+
+                {attributes.lessons?.data && (
+                  <div>
+                    <p class="text-sm text-text-muted mb-2">Número de Lecciones</p>
+                    <p class="text-lg font-semibold text-text-base">{attributes.lessons.data.length} lecciones</p>
+                  </div>
+                )}
+
+                <Button href="/contacto" class="w-full text-center block">Contactar</Button>
+              </div>
+            </div>
+          </aside>
         </div>
-      </article>
-    </div>
+      </Container>
+    </Section>
   </main>
 </BaseLayout>
-
-<style>
-  .breadcrumb {
-    margin: 1rem 0;
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-  }
-
-  .breadcrumb a {
-    color: var(--color-primary);
-    text-decoration: none;
-  }
-
-  .breadcrumb a:hover {
-    text-decoration: underline;
-  }
-
-  .breadcrumb span {
-    margin: 0 0.5rem;
-  }
-
-  .course-detail {
-    margin: 2rem 0;
-  }
-
-  .course-header {
-    background-color: var(--bg-secondary);
-    padding: 2rem;
-    border-radius: 0.5rem;
-    margin-bottom: 2rem;
-    border: 1px solid var(--border);
-  }
-
-  .course-image {
-    width: 100%;
-    max-height: 400px;
-    object-fit: cover;
-    border-radius: 0.5rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .course-header h1 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .course-info {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
-  }
-
-  .difficulty {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    border-radius: 0.25rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-  }
-
-  .difficulty[data-level="beginner"] {
-    background-color: #d1fae5;
-    color: #065f46;
-  }
-
-  .difficulty[data-level="intermediate"] {
-    background-color: #fef3c7;
-    color: #78350f;
-  }
-
-  .difficulty[data-level="advanced"] {
-    background-color: #fee2e2;
-    color: #7f1d1d;
-  }
-
-  .duration,
-  .category {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    background-color: var(--bg-primary);
-    border: 1px solid var(--border);
-    border-radius: 0.25rem;
-    font-size: 0.875rem;
-  }
-
-  .instructor {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border);
-  }
-
-  .instructor p {
-    margin: 0;
-    color: var(--text-secondary);
-  }
-
-  .course-content {
-    max-width: 800px;
-  }
-
-  .course-content section {
-    margin-bottom: 2rem;
-  }
-
-  .course-content h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .course-content p {
-    line-height: 1.8;
-    margin-bottom: 1rem;
-  }
-
-  .lessons-list {
-    list-style: none;
-    padding: 0;
-  }
-
-  .lessons-list li {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    background-color: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: 0.5rem;
-    margin-bottom: 0.5rem;
-    gap: 1rem;
-  }
-
-  .lesson-number {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    background-color: var(--color-primary);
-    color: white;
-    border-radius: 50%;
-    font-weight: bold;
-    flex-shrink: 0;
-  }
-
-  .lesson-title {
-    flex: 1;
-  }
-
-  .lesson-duration {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    white-space: nowrap;
-  }
-
-  .course-actions {
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border);
-  }
-
-  @media (max-width: 768px) {
-    .course-header h1 {
-      font-size: 1.75rem;
-    }
-
-    .course-info {
-      flex-direction: column;
-    }
-
-    .difficulty,
-    .duration,
-    .category {
-      display: block;
-      width: 100%;
-      text-align: center;
-    }
-  }
-</style>
-
-<script>
-  // Scroll suave
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-      e.preventDefault();
-      const target = document.querySelector(this.getAttribute('href'));
-      if (target) {
-        target.scrollIntoView({ behavior: 'smooth' });
-      }
-    });
-  });
-</script>
