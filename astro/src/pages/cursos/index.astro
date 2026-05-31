@@ -270,7 +270,7 @@ const description = 'Explora nuestro cat√°logo completo de cursos de programaci√
   }
 </style>
 
-<script define:vars={{ courses: JSON.stringify(courses) }}>
+<script define:vars={{ courses: JSON.stringify(courses), strapiUrl: import.meta.env.STRAPI_URL || 'http://127.0.0.1:1337' }}>
   const allCourses = JSON.parse(courses);
   let filteredCourses = allCourses;
   let currentPage = 1;
@@ -286,6 +286,12 @@ const description = 'Explora nuestro cat√°logo completo de cursos de programaci√
   const noResults = document.getElementById('noResults');
 
   const difficultyOrder = { beginner: 1, intermediate: 2, advanced: 3 };
+
+  function resolveImage(image) {
+    const path = image?.data?.attributes?.url ?? (typeof image === 'string' ? image : null);
+    if (!path) return null;
+    return path.startsWith('http') ? path : `${strapiUrl}${path}`;
+  }
 
   function applySort(results) {
     const order = sortSelect.value;
@@ -363,7 +369,7 @@ const description = 'Explora nuestro cat√°logo completo de cursos de programaci√
     coursesContainer.innerHTML = paginatedCourses
       .map(course => `
         <div class="card">
-          ${course.attributes.image ? `<img src="${course.attributes.image}" alt="${course.attributes.title}" class="card-image" />` : ''}
+          ${resolveImage(course.attributes.image) ? `<img src="${resolveImage(course.attributes.image)}" alt="${course.attributes.title}" class="card-image" />` : ''}
           <div class="card-content">
             <h3>${course.attributes.title}</h3>
             <p>${course.attributes.description || ''}</p>

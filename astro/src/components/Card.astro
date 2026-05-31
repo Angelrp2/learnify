@@ -9,7 +9,7 @@ interface Props {
 
 const { title, description, image, href, class: className = '' } = Astro.props;
 
-const STRAPI_URL = import.meta.env.STRAPI_URL || 'http://localhost:1337';
+const STRAPI_URL = (import.meta.env.STRAPI_URL || 'http://127.0.0.1:1337').trim();
 
 function getImageUrl(img: any): string | null {
   if (!img) return null;
