@@ -9,28 +9,33 @@ El repositorio es público. Puedes acceder directamente desde el navegador.
 
 CONTENIDO DEL REPOSITORIO:
 
-/strapi/          - Backend (Strapi CMS)
-/astro/           - Frontend (Astro SSG)
-/docs/            - Documentación técnica
-README.md         - Introducción al proyecto
-ESQUEMA_DATOS_STRAPI.md - Estructura de la base de datos
-MANUAL_INSTALACION.md - Instrucciones detalladas
+/strapi/          - Backend (Strapi CMS con 6 colecciones)
+/astro/           - Frontend (Astro + Tailwind CSS)
+/docs/            - Documentación técnica completa
+/ENTREGA/         - Archivos de entrega
+README.md         - Introducción e instrucciones de instalación
+MEMORIA_TECNICA.pdf - Memoria técnica del proyecto
 
-DOCUMENTACIÓN DISPONIBLE EN /docs/:
+DOCUMENTACIÓN EN /docs/:
 
-- ARQUITECTURA.md - Decisiones arquitectónicas
+- ARQUITECTURA.md       - Decisiones arquitectónicas
 - CONTENIDOS_TECNICOS.md - Conceptos JavaScript aplicados
-- ESTILOS.md - Sistema de diseño
-- SEO.md - Estrategia SEO
-- RGPD_SEGURIDAD.md - Cumplimiento RGPD
-- DIAGRAMA_ER.md - Diagrama entidad-relación
-- MANUAL_INSTALACION.md - Pasos de instalación
+- ESTILOS.md            - Sistema de diseño
+- SEO.md                - Estrategia SEO
+- RGPD_SEGURIDAD.md     - Cumplimiento RGPD
+- DIAGRAMA_ER.md        - Diagrama entidad-relación
+- MANUAL_INSTALACION.md - Pasos detallados de instalación
 
-COMMITS:
+HISTORIAL DE COMMITS:
 
-Todos los commits están documentados en el historial de Git.
-Cada commit representa una fase del desarrollo.
+21 commits documentados que representan las fases del desarrollo:
+- Estructura base
+- Colecciones Strapi
+- Integración Tailwind CSS
+- Componentes reutilizables
+- Páginas de categorías
+- Responsive y dark mode
+- Correcciones de imágenes y bugs
+- Mejoras de diseño
 
-RAMA PRINCIPAL:
-
-main - Rama principal con código estable
+RAMA PRINCIPAL: main

@@ -1,5 +1,5 @@
 ACCESO FUNCIONAL A STRAPI - LEARNIFY
-====================================
+=====================================
 
 INSTALACIÓN Y EJECUCIÓN LOCAL:
 
@@ -15,119 +15,67 @@ INSTALACIÓN Y EJECUCIÓN LOCAL:
 3. Copiar archivo de configuración:
    cp .env.example .env
 
-4. Iniciar Strapi en desarrollo:
+4. Iniciar Strapi:
    pnpm run dev
+   (o: npm run dev)
 
 5. Acceder al panel de administración:
    http://localhost:1337/admin
 
 PRIMERA EJECUCIÓN:
 
-En la primera ejecución, Strapi te pedirá crear una cuenta de administrador.
+En la primera ejecución Strapi pedirá crear una cuenta de administrador.
+Completa el formulario con email, contraseña y nombre.
 
-Completa el formulario con:
-- Email: tu email
-- Contraseña: contraseña segura
-- Nombre: tu nombre
+CONFIGURAR PERMISOS PÚBLICOS (obligatorio):
 
-DESPUÉS DE CREAR LA CUENTA:
-
-1. Accede al panel de administración
-2. En el menú izquierdo, verás las colecciones:
+1. Ve a Settings > Roles > Public
+2. Habilita "find" y "findOne" para:
    - Categories
-   - Instructors
    - Courses
+   - Instructors
    - Lessons
-   - BlogPosts
-   - ContactSubmissions
+   - Blog-posts
+3. Habilita "create" para Contact-submissions
+4. Guarda los cambios
 
-3. Crea contenido de prueba:
-   - Agrega una categoría (ej: "Desarrollo Web")
-   - Agrega un instructor (ej: "Juan Pérez")
-   - Agrega un curso (ej: "Introducción a JavaScript")
-   - Agrega lecciones al curso
+Sin este paso la API no devuelve datos y el frontend aparece vacío.
+
+CREAR CONTENIDO DE PRUEBA:
+
+Tras configurar los permisos, crea contenido desde Content Manager:
+
+CATEGORÍAS (crear primero):
+- Nombre: Frontend | Slug: frontend
+- Nombre: Backend  | Slug: backend
+- Nombre: DevOps   | Slug: devops
+
+INSTRUCTOR:
+- Nombre: Ana García
+- Email: ana@learnify.com
+- Bio: Desarrolladora web con 8 años de experiencia
+
+CURSOS (asignar categoría e instructor):
+- JavaScript desde Cero | Dificultad: beginner | Categoría: Frontend
+- React para Principiantes | Dificultad: intermediate | Categoría: Frontend
+- Tailwind CSS Completo | Dificultad: beginner | Categoría: Frontend
+- Node.js y Express | Dificultad: intermediate | Categoría: Backend
+- PostgreSQL Avanzado | Dificultad: advanced | Categoría: Backend
+- Docker y Kubernetes | Dificultad: advanced | Categoría: DevOps
+
+ARTÍCULOS DE BLOG:
+- Título: 5 razones para aprender JavaScript en 2024
+- Título: Por qué elegir Astro para tu próximo proyecto
+- Título: Docker: contenedores para desarrolladores web
 
 ACCESO A LA API:
 
-La API REST está disponible en:
-http://localhost:1337/api/
-
-Endpoints principales:
-- GET /api/courses - Listar cursos
-- GET /api/categories - Listar categorías
-- GET /api/instructors - Listar instructores
-- GET /api/blog-posts - Listar artículos
-
-VERIFICACIÓN DE FUNCIONAMIENTO:
-
-1. Inicia Strapi (paso 4 arriba)
-2. Abre http://localhost:1337/admin
-3. Crea contenido de prueba
-4. En otra terminal, inicia Astro:
-   cd astro
-   pnpm install
-   pnpm run dev
-
-5. Abre http://localhost:3000
-6. Deberías ver el contenido que creaste en Strapi
+http://localhost:1337/api/courses
+http://localhost:1337/api/categories
+http://localhost:1337/api/blog-posts
 
 SOLUCIÓN DE PROBLEMAS:
 
-Si Strapi no inicia:
-- Verifica que tienes Node.js 18+
-- Verifica que tienes pnpm instalado
-- Elimina node_modules y pnpm-lock.yaml, luego reinstala
-
-Si no puedes acceder a http://localhost:1337/admin:
-- Espera 30 segundos a que Strapi termine de iniciar
-- Verifica que no hay otro servicio en el puerto 1337
-
-Si la API no devuelve datos:
-- Verifica que creaste contenido en el panel de administración
-- Verifica que los permisos públicos están habilitados
-
-PERMISOS PÚBLICOS:
-
-Todos los endpoints están configurados para acceso público (sin autenticación).
-Esto permite que Astro acceda a los datos sin token.
-
-Para cambiar permisos:
-1. Ve a Settings > Roles > Public
-2. Habilita/deshabilita acceso según necesites
-
-DATOS DE PRUEBA:
-
-Para facilitar la evaluación, puedes crear estos datos de prueba:
-
-CATEGORÍA:
-- Nombre: Desarrollo Web
-- Descripción: Aprende a crear sitios web modernos
-
-INSTRUCTOR:
-- Nombre: Juan Pérez
-- Email: juan@example.com
-- Bio: Desarrollador web con 10 años de experiencia
-
-CURSO:
-- Título: Introducción a JavaScript
-- Descripción: Aprende los fundamentos de JavaScript
-- Dificultad: Beginner
-- Categoría: Desarrollo Web
-- Instructor: Juan Pérez
-
-LECCIÓN:
-- Título: Variables y Tipos de Datos
-- Contenido: En JavaScript, las variables se declaran con var, let o const...
-- Orden: 1
-- Curso: Introducción a JavaScript
-
-ARTÍCULO DE BLOG:
-- Título: 10 Consejos para Aprender JavaScript
-- Contenido: JavaScript es uno de los lenguajes más populares...
-- Categoría: Desarrollo Web
-- Autor: Juan Pérez
-
-CONTACTO:
-
-Si tienes problemas, consulta la documentación completa en:
-https://github.com/Angelrp2/learnify/blob/main/docs/MANUAL_INSTALACION.md
+- Si Strapi no inicia: verifica Node.js 18+ y elimina node_modules, reinstala
+- Si la API devuelve 403: configura los permisos públicos (ver arriba)
+- Si las imágenes no cargan: verifica que STRAPI_URL en astro/.env sea http://127.0.0.1:1337
