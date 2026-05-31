@@ -1,11 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Card from '../../components/Card.astro';
-import Button from '../../components/Button.astro';
 import Section from '../../components/Section.astro';
 import Container from '../../components/Container.astro';
 import { fetchCourses, fetchCategories } from '../../lib/api';
-import { searchCourses, filterCourses, paginateCourses } from '../../lib/utils';
 
 const courses = await fetchCourses();
 const categories = await fetchCategories();
@@ -16,441 +14,318 @@ const description = 'Explora nuestro catálogo completo de cursos de programaci�
 
 <BaseLayout title={title} description={description}>
   <main class="flex-1">
-    <Section class="py-8">
+
+    <!-- Hero / CTA -->
+    <Section class="py-10 sm:py-14 bg-gradient-to-br from-blue-600 to-blue-900 text-white">
       <Container>
-      <h1 class="text-2xl sm:text-3xl font-bold text-text-base mt-6 mb-4">Cursos Disponibles</h1>
-      
-      <div class="courses-section">
-        <aside class="sidebar">
-          <div class="filter-group">
-            <h3>Filtros</h3>
-            
-            <div class="filter-item">
-              <h4>Dificultad</h4>
-              <label>
-                <input type="checkbox" name="difficulty" value="beginner" />
-                Principiante
-              </label>
-              <label>
-                <input type="checkbox" name="difficulty" value="intermediate" />
-                Intermedio
-              </label>
-              <label>
-                <input type="checkbox" name="difficulty" value="advanced" />
-                Avanzado
-              </label>
+        <div class="max-w-2xl">
+          <h1 class="text-3xl sm:text-4xl font-bold mb-3 leading-tight">
+            Cursos de Programación
+          </h1>
+          <p class="text-base sm:text-lg opacity-90 mb-6">
+            {courses.length} cursos disponibles para llevar tu carrera al siguiente nivel.
+          </p>
+          {categories.length > 0 && (
+            <div class="flex flex-wrap gap-2">
+              {categories.map((cat: any) => (
+                <span class="px-3 py-1 bg-white/20 rounded-full text-xs sm:text-sm font-medium">
+                  {cat.attributes?.name ?? cat.name}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </Container>
+    </Section>
+
+    <!-- Main content -->
+    <Section class="py-8 sm:py-12">
+      <Container>
+
+        <!-- Mobile: filter toggle -->
+        <button
+          id="filterToggle"
+          class="md:hidden w-full mb-4 flex items-center justify-between px-4 py-3 bg-bg-muted border border-border rounded-lg text-text-base font-medium hover:border-primary transition-colors"
+        >
+          <span class="flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+            </svg>
+            Filtros
+          </span>
+          <svg id="filterChevron" class="w-4 h-4 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+
+        <div class="flex flex-col md:flex-row gap-6 lg:gap-8 items-start">
+
+          <!-- Sidebar -->
+          <aside
+            id="filterPanel"
+            class="hidden md:block w-full md:w-56 lg:w-64 flex-shrink-0 bg-bg-muted border border-border rounded-xl p-5 md:sticky md:top-24"
+          >
+            <h3 class="text-sm font-semibold text-text-base uppercase tracking-wide mb-4">Filtros</h3>
+
+            <div class="mb-5">
+              <h4 class="text-xs font-medium text-text-muted uppercase tracking-wide mb-3">Dificultad</h4>
+              <div class="space-y-2">
+                {[
+                  { value: 'beginner', label: 'Principiante' },
+                  { value: 'intermediate', label: 'Intermedio' },
+                  { value: 'advanced', label: 'Avanzado' },
+                ].map(({ value, label }) => (
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      name="difficulty"
+                      value={value}
+                      class="w-4 h-4 accent-primary cursor-pointer"
+                    />
+                    <span class="text-sm text-text-base group-hover:text-primary transition-colors">{label}</span>
+                  </label>
+                ))}
+              </div>
             </div>
 
             {categories.length > 0 && (
-              <div class="filter-item">
-                <h4>Categoría</h4>
-                <select name="category" id="categoryFilter">
-                  <option value="">Todas las categorías</option>
-                  {categories.map(cat => (
-                    <option value={cat.id}>{cat.attributes.name}</option>
+              <div>
+                <h4 class="text-xs font-medium text-text-muted uppercase tracking-wide mb-3">Categoría</h4>
+                <select
+                  id="categoryFilter"
+                  class="w-full px-3 py-2 text-sm bg-bg-base border border-border rounded-lg text-text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                >
+                  <option value="">Todas</option>
+                  {categories.map((cat: any) => (
+                    <option value={cat.id}>{cat.attributes?.name ?? cat.name}</option>
                   ))}
                 </select>
               </div>
             )}
-          </div>
-        </aside>
 
-        <div class="main-content">
-          <div class="search-bar">
-            <input
-              type="text"
-              id="searchInput"
-              placeholder="Buscar cursos..."
-            />
-          </div>
+            <button
+              id="clearFilters"
+              class="mt-5 w-full text-xs text-text-muted hover:text-primary transition-colors py-1"
+            >
+              Limpiar filtros
+            </button>
+          </aside>
 
-          <div class="sort-bar">
-            <label for="sortSelect">Ordenar por:</label>
-            <select id="sortSelect">
-              <option value="default">Relevancia</option>
-              <option value="title-asc">Título A → Z</option>
-              <option value="title-desc">Título Z → A</option>
-              <option value="difficulty-asc">Dificultad (menor → mayor)</option>
-              <option value="difficulty-desc">Dificultad (mayor → menor)</option>
-            </select>
-          </div>
+          <!-- Course list -->
+          <div class="flex-1 min-w-0">
 
-          <div id="loadingMessage" class="loading" style="display: none;">
-            Cargando cursos...
-          </div>
-
-          <div id="coursesContainer" class="courses-grid">
-            {courses.length === 0 ? (
-              <p>No hay cursos disponibles</p>
-            ) : (
-              courses.slice(0, 6).map(course => (
-                <Card
-                  title={course.attributes.title}
-                  description={course.attributes.description}
-                  image={course.attributes.image}
-                  href={`/cursos/${course.attributes.slug}`}
+            <!-- Search + Sort -->
+            <div class="flex flex-col sm:flex-row gap-3 mb-6">
+              <div class="relative flex-1">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input
+                  type="text"
+                  id="searchInput"
+                  placeholder="Buscar cursos..."
+                  class="w-full pl-10 pr-4 py-2.5 bg-bg-base border border-border rounded-lg text-sm text-text-base placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                 />
-              ))
-            )}
-          </div>
+              </div>
+              <select
+                id="sortSelect"
+                class="sm:w-48 px-3 py-2.5 bg-bg-base border border-border rounded-lg text-sm text-text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              >
+                <option value="default">Relevancia</option>
+                <option value="title-asc">Título A → Z</option>
+                <option value="title-desc">Título Z → A</option>
+                <option value="difficulty-asc">Nivel: básico → avanzado</option>
+                <option value="difficulty-desc">Nivel: avanzado → básico</option>
+              </select>
+            </div>
 
-          <div id="paginationContainer" class="pagination">
-            {/* Se llena con JavaScript */}
-          </div>
+            <!-- Results count -->
+            <p id="resultsCount" class="text-xs text-text-muted mb-4"></p>
 
-          <div id="noResults" class="no-results" style="display: none;">
-            No se encontraron cursos que coincidan con tu búsqueda.
+            <!-- Loading -->
+            <div id="loadingMessage" class="hidden text-center py-12 text-text-muted text-sm">
+              Cargando cursos...
+            </div>
+
+            <!-- Cards grid -->
+            <div id="coursesContainer" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 mb-6">
+              {courses.length === 0 ? (
+                <p class="col-span-full text-text-muted text-sm">No hay cursos disponibles.</p>
+              ) : (
+                courses.slice(0, 6).map((course: any) => (
+                  <Card
+                    title={course.attributes?.title ?? course.title ?? 'Sin título'}
+                    description={course.attributes?.description ?? course.description}
+                    image={course.attributes?.image}
+                    href={`/cursos/${course.attributes?.slug ?? course.slug}`}
+                  />
+                ))
+              )}
+            </div>
+
+            <!-- No results -->
+            <div id="noResults" class="hidden text-center py-12">
+              <p class="text-text-muted mb-4">No se encontraron cursos con esos filtros.</p>
+              <button id="clearFilters2" class="text-sm text-primary hover:underline">Limpiar filtros</button>
+            </div>
+
+            <!-- Pagination -->
+            <div id="paginationContainer" class="flex flex-wrap justify-center gap-2 mt-2"></div>
           </div>
         </div>
-      </div>
       </Container>
     </Section>
   </main>
 </BaseLayout>
 
 <style>
-  h1 {
-    margin: 2rem 0 1rem;
-    font-size: 2rem;
-  }
-
-  .courses-section {
-    display: grid;
-    grid-template-columns: 250px 1fr;
-    gap: 2rem;
-    margin: 2rem 0;
-  }
-
-  .sidebar {
-    background-color: var(--bg-muted);
-    padding: 1.5rem;
-    border-radius: 0.5rem;
-    border: 1px solid var(--border);
-    height: fit-content;
-  }
-
-  .filter-group h3 {
-    margin-bottom: 1rem;
-    font-size: 1.1rem;
-  }
-
-  .filter-item {
-    margin-bottom: 1.5rem;
-  }
-
-  .filter-item h4 {
-    font-size: 0.95rem;
-    margin-bottom: 0.75rem;
-    color: var(--text-muted);
-  }
-
-  .filter-item label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .filter-item select {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid var(--border);
-    border-radius: 0.25rem;
-    background-color: var(--bg-base);
-    color: var(--text-base);
-  }
-
-  .sort-bar {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-    font-size: 0.9rem;
-    color: var(--text-muted);
-  }
-
-  .sort-bar select {
-    padding: 0.5rem 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: 0.5rem;
-    background-color: var(--bg-base);
-    color: var(--text-base);
-    cursor: pointer;
-  }
-
-  .search-bar {
-    margin-bottom: 2rem;
-  }
-
-  .search-bar input {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: 0.5rem;
-    font-size: 1rem;
-    background-color: var(--bg-base);
-    color: var(--text-base);
-  }
-
-  .search-bar input:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-  }
-
-  .courses-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-  }
-
-  .card {
+  /* Only for JS-rendered cards (Tailwind can't purge dynamic strings) */
+  .dyn-card {
     background-color: var(--bg-muted);
     border: 1px solid var(--border);
     border-radius: 0.5rem;
     overflow: hidden;
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: transform 0.25s, box-shadow 0.25s;
   }
-
-  .card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  .dyn-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+  .dyn-card-img { width: 100%; height: 176px; object-fit: cover; display: block; }
+  .dyn-card-body { padding: 1rem; }
+  .dyn-card-title { font-size: 0.9375rem; font-weight: 600; color: var(--text-base); margin-bottom: 0.375rem; }
+  .dyn-card-desc {
+    font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.5;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
   }
-
-  .card-image {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    display: block;
+  .dyn-card-link { font-size: 0.8125rem; font-weight: 500; color: var(--primary); text-decoration: none; }
+  .dyn-card-link:hover { text-decoration: underline; }
+  .pag-btn {
+    padding: 0.375rem 0.75rem; border: 1px solid var(--border); border-radius: 0.375rem;
+    background-color: var(--bg-muted); color: var(--text-base); font-size: 0.875rem; cursor: pointer;
+    transition: all 0.2s;
   }
-
-  .card-content {
-    padding: 1.25rem;
-  }
-
-  .card-content h3 {
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: var(--text-base);
-  }
-
-  .card-content p {
-    font-size: 0.875rem;
-    color: var(--text-muted);
-    margin-bottom: 0.75rem;
-    line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .card-link {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--primary);
-    text-decoration: none;
-  }
-
-  .loading {
-    text-align: center;
-    padding: 2rem;
-    color: var(--text-muted);
-  }
-
-  .no-results {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 2rem;
-    color: var(--text-muted);
-  }
-
-  .pagination {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-top: 2rem;
-  }
-
-  .pagination button {
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--border);
-    background-color: var(--bg-muted);
-    color: var(--text-base);
-    border-radius: 0.25rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  .pagination button:hover:not(:disabled) {
-    background-color: var(--primary);
-    color: white;
-  }
-
-  .pagination button.active {
-    background-color: var(--primary);
-    color: white;
-  }
-
-  .pagination button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  @media (max-width: 768px) {
-    .courses-section {
-      grid-template-columns: 1fr;
-    }
-
-    .sidebar {
-      order: 2;
-    }
-
-    .main-content {
-      order: 1;
-    }
-
-    .courses-grid {
-      grid-template-columns: 1fr;
-    }
-  }
+  .pag-btn:hover:not(:disabled) { background-color: var(--primary); color: white; border-color: var(--primary); }
+  .pag-btn.active { background-color: var(--primary); color: white; border-color: var(--primary); }
+  .pag-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 </style>
 
 <script define:vars={{ courses: JSON.stringify(courses), strapiUrl: import.meta.env.STRAPI_URL || 'http://127.0.0.1:1337' }}>
   const allCourses = JSON.parse(courses);
-  let filteredCourses = allCourses;
+  let filtered = [...allCourses];
   let currentPage = 1;
   const pageSize = 6;
+  const diffOrder = { beginner: 1, intermediate: 2, advanced: 3 };
 
-  const searchInput = document.getElementById('searchInput');
-  const sortSelect = document.getElementById('sortSelect');
-  const difficultyCheckboxes = document.querySelectorAll('input[name="difficulty"]');
+  const searchInput    = document.getElementById('searchInput');
+  const sortSelect     = document.getElementById('sortSelect');
   const categoryFilter = document.getElementById('categoryFilter');
-  const loadingMessage = document.getElementById('loadingMessage');
-  const coursesContainer = document.getElementById('coursesContainer');
-  const paginationContainer = document.getElementById('paginationContainer');
-  const noResults = document.getElementById('noResults');
+  const diffBoxes      = document.querySelectorAll('input[name="difficulty"]');
+  const container      = document.getElementById('coursesContainer');
+  const pagination     = document.getElementById('paginationContainer');
+  const noResults      = document.getElementById('noResults');
+  const loading        = document.getElementById('loadingMessage');
+  const resultsCount   = document.getElementById('resultsCount');
+  const filterToggle   = document.getElementById('filterToggle');
+  const filterPanel    = document.getElementById('filterPanel');
+  const filterChevron  = document.getElementById('filterChevron');
 
-  const difficultyOrder = { beginner: 1, intermediate: 2, advanced: 3 };
+  // Mobile filter toggle
+  filterToggle?.addEventListener('click', () => {
+    const open = !filterPanel.classList.contains('hidden');
+    filterPanel.classList.toggle('hidden', open);
+    filterChevron?.classList.toggle('rotate-180', !open);
+  });
 
-  function resolveImage(image) {
+  function imgSrc(image) {
     const path = image?.data?.attributes?.url ?? (typeof image === 'string' ? image : null);
     if (!path) return null;
     return path.startsWith('http') ? path : `${strapiUrl}${path}`;
   }
 
-  function applySort(results) {
-    const order = sortSelect.value;
-    const sorted = [...results];
-    if (order === 'title-asc') {
-      sorted.sort((a, b) => a.attributes.title.localeCompare(b.attributes.title));
-    } else if (order === 'title-desc') {
-      sorted.sort((a, b) => b.attributes.title.localeCompare(a.attributes.title));
-    } else if (order === 'difficulty-asc') {
-      sorted.sort((a, b) =>
-        (difficultyOrder[a.attributes.difficulty] || 0) - (difficultyOrder[b.attributes.difficulty] || 0)
-      );
-    } else if (order === 'difficulty-desc') {
-      sorted.sort((a, b) =>
-        (difficultyOrder[b.attributes.difficulty] || 0) - (difficultyOrder[a.attributes.difficulty] || 0)
-      );
-    }
-    return sorted;
+  function clearAll() {
+    searchInput.value = '';
+    sortSelect.value = 'default';
+    diffBoxes.forEach(cb => cb.checked = false);
+    if (categoryFilter) categoryFilter.value = '';
+    applyFilters();
   }
+
+  document.getElementById('clearFilters')?.addEventListener('click', clearAll);
+  document.getElementById('clearFilters2')?.addEventListener('click', clearAll);
 
   function applyFilters() {
-    loadingMessage.style.display = 'block';
-    coursesContainer.style.display = 'none';
-
-    let results = allCourses;
-
-    const searchQuery = searchInput.value;
-    if (searchQuery) {
-      const regex = new RegExp(searchQuery, 'i');
-      results = results.filter(course => {
-        const { attributes } = course;
-        return regex.test(attributes.title) || regex.test(attributes.description);
-      });
+    let res = [...allCourses];
+    const q = searchInput.value.trim();
+    if (q) {
+      const re = new RegExp(q, 'i');
+      res = res.filter(c => re.test(c.attributes.title) || re.test(c.attributes.description || ''));
     }
+    const diffs = [...diffBoxes].filter(cb => cb.checked).map(cb => cb.value);
+    if (diffs.length) res = res.filter(c => diffs.includes(c.attributes.difficulty));
+    const cat = categoryFilter?.value;
+    if (cat) res = res.filter(c => c.attributes.category?.data?.id === parseInt(cat));
 
-    const selectedDifficulties = Array.from(difficultyCheckboxes)
-      .filter(cb => cb.checked)
-      .map(cb => cb.value);
+    const order = sortSelect.value;
+    if (order === 'title-asc')       res.sort((a,b) => a.attributes.title.localeCompare(b.attributes.title));
+    else if (order === 'title-desc') res.sort((a,b) => b.attributes.title.localeCompare(a.attributes.title));
+    else if (order === 'difficulty-asc')  res.sort((a,b) => (diffOrder[a.attributes.difficulty]||0) - (diffOrder[b.attributes.difficulty]||0));
+    else if (order === 'difficulty-desc') res.sort((a,b) => (diffOrder[b.attributes.difficulty]||0) - (diffOrder[a.attributes.difficulty]||0));
 
-    if (selectedDifficulties.length > 0) {
-      results = results.filter(course =>
-        selectedDifficulties.includes(course.attributes.difficulty)
-      );
-    }
-
-    const selectedCategory = categoryFilter?.value;
-    if (selectedCategory) {
-      results = results.filter(course =>
-        course.attributes.category?.data?.id === parseInt(selectedCategory)
-      );
-    }
-
-    filteredCourses = applySort(results);
+    filtered = res;
     currentPage = 1;
-    renderCourses();
+    render();
   }
 
-  function renderCourses() {
-    loadingMessage.style.display = 'none';
-    coursesContainer.style.display = '';
+  function render() {
+    const total = filtered.length;
+    resultsCount.textContent = total === allCourses.length
+      ? `${total} cursos`
+      : `${total} de ${allCourses.length} cursos`;
 
-    if (filteredCourses.length === 0) {
-      coursesContainer.innerHTML = '';
-      noResults.style.display = 'block';
-      paginationContainer.innerHTML = '';
+    if (total === 0) {
+      container.innerHTML = '';
+      noResults.classList.remove('hidden');
+      pagination.innerHTML = '';
       return;
     }
-
-    noResults.style.display = 'none';
+    noResults.classList.add('hidden');
 
     const start = (currentPage - 1) * pageSize;
-    const paginatedCourses = filteredCourses.slice(start, start + pageSize);
-    const totalPages = Math.ceil(filteredCourses.length / pageSize);
+    const page  = filtered.slice(start, start + pageSize);
+    const totalPages = Math.ceil(total / pageSize);
 
-    coursesContainer.innerHTML = paginatedCourses
-      .map(course => `
-        <div class="card">
-          ${resolveImage(course.attributes.image) ? `<img src="${resolveImage(course.attributes.image)}" alt="${course.attributes.title}" class="card-image" />` : ''}
-          <div class="card-content">
-            <h3>${course.attributes.title}</h3>
-            <p>${course.attributes.description || ''}</p>
-            <a href="/cursos/${course.attributes.slug}" class="card-link">Ver más →</a>
-          </div>
+    container.innerHTML = page.map(c => {
+      const img = imgSrc(c.attributes.image);
+      return `<div class="dyn-card">
+        ${img ? `<img src="${img}" alt="${c.attributes.title}" class="dyn-card-img"/>` : ''}
+        <div class="dyn-card-body">
+          <p class="dyn-card-title">${c.attributes.title}</p>
+          <p class="dyn-card-desc">${c.attributes.description || ''}</p>
+          <a href="/cursos/${c.attributes.slug}" class="dyn-card-link">Ver curso →</a>
         </div>
-      `)
-      .join('');
+      </div>`;
+    }).join('');
 
-    let paginationHTML = '';
-    if (currentPage > 1) {
-      paginationHTML += `<button onclick="goToPage(${currentPage - 1})">← Anterior</button>`;
-    }
+    // Pagination
+    let html = '';
+    if (currentPage > 1) html += `<button class="pag-btn" data-page="${currentPage-1}">← Anterior</button>`;
     for (let i = 1; i <= totalPages; i++) {
-      paginationHTML += `<button onclick="goToPage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`;
+      html += `<button class="pag-btn${i===currentPage?' active':''}" data-page="${i}">${i}</button>`;
     }
-    if (currentPage < totalPages) {
-      paginationHTML += `<button onclick="goToPage(${currentPage + 1})">Siguiente →</button>`;
-    }
-    paginationContainer.innerHTML = paginationHTML;
+    if (currentPage < totalPages) html += `<button class="pag-btn" data-page="${currentPage+1}">Siguiente →</button>`;
+    pagination.innerHTML = html;
   }
 
-  window.goToPage = function(page) {
-    currentPage = page;
-    renderCourses();
+  pagination.addEventListener('click', e => {
+    const btn = e.target.closest('[data-page]');
+    if (!btn) return;
+    currentPage = parseInt(btn.dataset.page);
+    render();
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  });
 
   searchInput.addEventListener('input', applyFilters);
   sortSelect.addEventListener('change', applyFilters);
-  difficultyCheckboxes.forEach(cb => cb.addEventListener('change', applyFilters));
+  diffBoxes.forEach(cb => cb.addEventListener('change', applyFilters));
   categoryFilter?.addEventListener('change', applyFilters);
 
-  renderCourses();
+  render();
 </script>
