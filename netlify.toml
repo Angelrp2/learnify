@@ -1,0 +1,8 @@
+[build]
+  base = "astro"
+  command = "pnpm install && pnpm build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "18"
+  PNPM_VERSION = "8"

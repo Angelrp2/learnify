@@ -50,6 +50,7 @@ ehthumbs.db
 
 # Strapi
 strapi/.strapi/
+strapi/.tmp/
 strapi/exports/
 strapi/imports/
 
